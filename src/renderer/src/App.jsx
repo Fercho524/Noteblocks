@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import ConfigToolbar from './components/ConfigToolbar';
+import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { ScrollPanel } from 'primereact/scrollpanel';
+import EditorView from './components/EditorView';
+
+
+import "primereact/resources/themes/soho-dark/theme.css";
+import 'primeicons/primeicons.css';
 
 import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
 
+import { Toolbar } from 'primereact/toolbar';
+
+import mainIcon from './images/logo.svg'
+import NotebookSidebar from './components/NotebookSidebar';
 
 
 function App() {
@@ -14,14 +24,38 @@ function App() {
     window.api.getFiles('/home/darkplayer/Documentos/Notas').then(setFiles);
   }, []);
 
-  const [count, setCount] = useState(0);
+
 
   return (
-    <div className="text-center">
-      <Button label="Click" icon="pi pi-plus" onClick={e => setCount(count + 1)}></Button>
-      <div className="text-2xl text-900 mt-3">{count}</div>
-      <Calendar value={date} onChange={(e) => setDate(e.value)} />
-    </div>
+    <Splitter style={{ height: '100vh' }}>
+      <SplitterPanel className="flex align-items-center justify-content-center" size={15} minSize={10}>
+        <NotebookSidebar />
+      </SplitterPanel>
+
+      <SplitterPanel className="flex align-items-center justify-content-center" size={15} minSize={10}>
+        Notes
+      </SplitterPanel>
+
+      <SplitterPanel size={70}>
+
+        <Splitter layout="vertical">
+
+
+
+          <SplitterPanel size={93}>
+            <EditorView />
+          </SplitterPanel>
+
+          <SplitterPanel className="flex align-items-center justify-content-center" size={7}>
+            <Toolbar start={"fd"} end={"endContent"} center={"Center"} style={{ width: "100%" }} />
+
+          </SplitterPanel>
+
+        </Splitter>
+
+      </SplitterPanel>
+
+    </Splitter>
   );
 }
 

@@ -17,6 +17,7 @@
 
 .tab-item button.close-tab:hover {
     color: red;
+    background: rgba(255, 255, 255, 0.397);
 }
 
 
