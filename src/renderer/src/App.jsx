@@ -7,7 +7,7 @@ import { Splitter, SplitterPanel } from 'primereact/splitter';
 
 import NotebookSidebar from './components/NotebookSidebar';
 import NoteSidebar from './components/NoteSidebar';
-import EditorView from './components/EditorView';
+import EditorMarkdown from './components/EditorView';
 import MDToolbar from './components/MDToolbar';
 
 
@@ -32,7 +32,7 @@ function App() {
       </SplitterPanel>
       {/* Editor */}
       <SplitterPanel size={65}>
-        <EditorView/>
+        <EditorMarkdown/>
       </SplitterPanel>
     </Splitter>
   );

@@ -42,26 +42,12 @@ export default function NotebookSidebar() {
 
 
 
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const countries = [
-        { name: 'Australia', code: 'AU' },
-        { name: 'Brazil', code: 'BR' },
-        { name: 'China', code: 'CN' },
-        { name: 'Egypt', code: 'EG' },
-        { name: 'France', code: 'FR' },
-        { name: 'Germany', code: 'DE' },
-        { name: 'India', code: 'IN' },
-        { name: 'Japan', code: 'JP' },
-        { name: 'Spain', code: 'ES' },
-        { name: 'United States', code: 'US' }
-    ];
-
 
 
     return (
         <Splitter style={{ height: '100vh' }} layout="vertical">
 
-            <SplitterPanel className="flex align-items-center justify-content-center" size={5}>
+            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={25}>
                 <Card style={{ padding: "0px" }} subTitle="Noteblocks">
                     <div style={{cursor: "pointer"}} >
                         <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-file'></i>Home
@@ -77,11 +63,10 @@ export default function NotebookSidebar() {
                         <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-folder'></i>Repositories
                         <RepoSelector visible={repoSelectVisible} setVisible={setRepoSelectVisible} />
                     </div>
-
                 </Card>
             </SplitterPanel>
 
-            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={70}>
+            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={35}>
                 <Card style={{ padding: "0px", width: "100%" }} subTitle="Notebooks">
                     <div>
                         <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
@@ -111,8 +96,8 @@ export default function NotebookSidebar() {
                 </Card>
             </SplitterPanel>
 
-            <SplitterPanel className="flex align-items-center justify-content-center" size={25}>
-                <Card style={{ width: "100%", overflowY: "scroll", height: "25vh" }} subTitle="Etiquetas">
+            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={24}>
+                <Card style={{ width: "100%", overflowY: "scroll" }} subTitle="Etiquetas">
                     <div className="card flex flex-wrap justify-content-center gap-2">
                         <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
                         <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
@@ -139,7 +124,7 @@ export default function NotebookSidebar() {
                 </Card>
             </SplitterPanel>
 
-            <SplitterPanel className="flex align-items-center justify-content-center" size={10}>
+            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={6}>
                 <center>
                     <div>
                         <button style={{ fontSize: '2rem', margin: "0.5rem" }} className="p-link inline-flex justify-around align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">

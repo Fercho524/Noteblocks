@@ -13,6 +13,8 @@
   <script src="styles/katex/katex.min.js"></script>
   <script src="styles/katex/contrib/auto-render.js"></script>
 
+  <link rel="stylesheet" href="styles/editor.css">
+
   <style>
     body,
     html,
@@ -73,11 +75,46 @@
       /* Un poco más opaco al pasar el mouse */
     }
 
-    .cm-content,.editor, .cm-activeLine, .code {
-      word-break: break-word !important;
+    .cm-content,
+    .editor,
+    .cm-activeLine,
+    .code {
+      overflow-wrap: break-word;
+      word-break: break-word;
       background: transparent !important;
-      overflow-wrap: break-word !important; 
-      white-space: normal !important;
+
+    }
+
+    #code * {
+      overflow-wrap: break-word;
+      word-break: break-word;
+      background: transparent !important;
+    }
+
+    /* Para navegadores basados en WebKit/Chromium */
+    .cm-content ::selection {
+      background: var(--primary-color) !important;
+
+      color: #fff !important;
+      /* asegura contraste */
+    }
+
+    .cm-content::-moz-selection {
+      background: var(--primary-color) !important;
+      color: #fff !important;
+    }
+
+    /* También cubrimos el layer interno de selección de CM6 */
+    .cm-editor .cm-selectionBackground {
+      background-color: var(--primary-color) !important;
+    }
+
+    .cm-selectionBackground {
+      background-color: var(--primary-color) !important;
+    }
+
+    .cm-editor .cm-selectionBackground {
+      background-color: var(--primary-color) !important;
     }
   </style>
 </head>
@@ -85,7 +122,7 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-  
+
 </body>
 
 </html>

@@ -1,30 +1,12 @@
-![alt text](image.png)
+# Noteblocks
 
+A simple markdown editor gui
 
-const [files, setFiles] = useState([]);
+![alt text](image-1.png)
+![alt text](image-2.png)
 
-  useEffect(() => {
-    window.api.getFiles('/home/darkplayer/Documentos/Notas').then(setFiles);
-  }, []);
+Fixes
 
+![alt text](image-3.png)
 
-
-
-
-  <Splitter size={100} layout='vertical'>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={20} minSize={10}>
-              
-            </SplitterPanel>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={80}>
-              <Splitter >
-                <SplitterPanel className="flex align-items-center justify-content-center" size={50} minSize={50}>
-                  
-                </SplitterPanel>
-                <SplitterPanel style={{ overflowX: "scroll" }} className="flex align-items-center justify-content-center" size={50}>
-                  
-                </SplitterPanel>
-
-
-              </Splitter>
-            </SplitterPanel>
-          </Splitter>
+Now, with a code mirror !

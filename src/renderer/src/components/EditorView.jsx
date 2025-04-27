@@ -5,8 +5,10 @@ import { html2MarkDown } from '../utils/markdowwn2HTML';
 import MDToolbar from './MDToolbar';
 import CodeMirror from '@uiw/react-codemirror';
 import mermaid from 'mermaid';
+import { EditorView } from '@codemirror/view';
 
 
+import { drawSelection } from '@codemirror/view';
 
 import { markdownLanguage,markdown } from '@codemirror/lang-markdown';
 
@@ -40,7 +42,7 @@ function renderMath(content) {
 }
 
 
-export default function EditorView() {
+export default function EditorMarkdown() {
   const scrollableTabs = [
     { title: "Tab 1" },
     { title: "Tab 2" },
@@ -89,12 +91,13 @@ export default function EditorView() {
                       border: "none",
                       outline: "none",
                       overflowY: "scroll",
-                      overflowX: "scroll",
+                      overflowX: "hidden",
                       marginBottom: "0px",
                       padding: "0rem",
-                      wordBreak: "break-word",
+                      wordBreak: "break-word", // Aunque no siempre basta
                       overflowWrap: "break-word",
-                      whiteSpace: "normal",
+                      whiteSpace: "pre-wrap", 
+                      
                     }}
                     height="85vh"
                     value={content}
@@ -103,9 +106,14 @@ export default function EditorView() {
                         lineNumbers: true,
                         bracketMatching: true,
                         lineBreak: true,
+                        lineWrapping: true,
                       }
                     }
-                    extensions={[markdown({ base: markdownLanguage })]}
+                    extensions={[markdown({ 
+                      base: markdownLanguage }),
+                      EditorView.lineWrapping,
+                      drawSelection()
+                    ]}
                     theme='dark'
                     onChange={React.useCallback((val, viewUpdate) => {
                       setContent(val);
