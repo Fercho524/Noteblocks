@@ -1,10 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { VirtualScroller } from 'primereact/virtualscroller';
 
+import { classNames } from 'primereact/utils';
 import { Tag } from 'primereact/tag';
+import { Card } from 'primereact/card';
 
-import { Dropdown } from 'primereact/dropdown';
-import { ListBox } from 'primereact/listbox';
+import GraphView from './GraphView';
+import RepoSelector from './RepoSelector'
 
 
 export default function NotebookSidebar() {
@@ -15,24 +18,28 @@ export default function NotebookSidebar() {
     const btnRef4 = useRef(null);
 
 
-    const [selectedCity, setSelectedCity] = useState(null);
-    const cities = [
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
-    ];
+    const [items] = useState(Array.from({ length: 100000 }).map((_, i) => `Archivo-${i}.md`));
 
+    const itemTemplate = (item, options) => {
+        const className = classNames('flex align-items-center p-2', {
+            'surface-hover': options.odd
+        });
 
-    const countryTemplate = (option) => {
         return (
-            <div className="flex align-items-center">
-                <img alt={option.name} src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png" className={`flag flag-${option.code.toLowerCase()}`} style={{ width: '1.25rem', marginRight: '.5rem' }} />
-                <div>{option.name}</div>
+            <div className={className} style={{ height: options.props.itemSize + 'px' }}>
+                <i className="pi pi-file" style={{ fontSize: '1rem', marginRight: "0.5rem" }}></i>
+                <span>
+                    {item}
+                </span>
             </div>
         );
     };
+
+
+
+    const [sidebarVisible, setSidebarVisible] = useState(false);
+    const [repoSelectVisible, setRepoSelectVisible] = useState(false)
+
 
 
     const [selectedCountry, setSelectedCountry] = useState(null);
@@ -52,50 +59,103 @@ export default function NotebookSidebar() {
 
 
     return (
-        <Splitter style={{ height: '100vh' }} layout="vertical" size={100}>
+        <Splitter style={{ height: '100vh' }} layout="vertical">
+
             <SplitterPanel className="flex align-items-center justify-content-center" size={5}>
-                Noteblocks
+                <Card style={{ padding: "0px" }} subTitle="Noteblocks">
+                    <div style={{cursor: "pointer"}} >
+                        <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-file'></i>Home
+                    </div>
+                    <div style={{cursor: "pointer"}} >
+                        <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-search'></i>All notes
+                    </div>
+                    <div  style={{cursor: "pointer"}} onClick={() => setSidebarVisible(true)} >
+                        <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-sitemap'></i>Graph View
+                        <GraphView visible={sidebarVisible} setVisible={setSidebarVisible} />
+                    </div>
+                    <div style={{cursor: "pointer"}}  onClick={() => setRepoSelectVisible(true)}>
+                        <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-folder'></i>Repositories
+                        <RepoSelector visible={repoSelectVisible} setVisible={setRepoSelectVisible} />
+                    </div>
+
+                </Card>
             </SplitterPanel>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={20}>
 
-
-                <div className="card flex justify-content-center">
-                    <Dropdown value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={cities} optionLabel="name"
-                        placeholder="Select a City" className="w-full md:w-14rem" checkmark={true} highlightOnSelect={false} />
-                </div>
-
-                <div className="card flex justify-content-center">
-                    <ListBox value={selectedCountry} onChange={(e) => setSelectedCountry(e.value)} options={countries} optionLabel="name"
-                        itemTemplate={countryTemplate} className="w-full md:w-14rem" listStyle={{ maxHeight: '250px' }} />
-                </div>
-
-
+            <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={70}>
+                <Card style={{ padding: "0px", width: "100%" }} subTitle="Notebooks">
+                    <div>
+                        <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
+                        Agenda
+                    </div>
+                    <hr />
+                    <div>
+                        <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
+                        Browser
+                    </div>
+                    <hr />
+                    <div>
+                        <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
+                        Diario
+                    </div>
+                    <hr />
+                    <div>
+                        <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
+                        Inbox
+                    </div>
+                    <hr />
+                    <div>
+                        <i style={{ paddingLeft: "0.9rem", fontSize: '0.7rem', marginRight: "0.5rem", marginBottom: "0.2rem" }} className='pi pi-book'></i>
+                        Recomendaciones
+                    </div>
+                    <hr />
+                </Card>
             </SplitterPanel>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={50}>
-                Notebooks
-                <div className="card flex justify-content-center">
-                    <ListBox value={selectedCountry} onChange={(e) => setSelectedCountry(e.value)} options={countries} optionLabel="name"
-                        itemTemplate={countryTemplate} className="w-full md:w-14rem" listStyle={{ maxHeight: '250px' }} />
-                </div>
+
+            <SplitterPanel className="flex align-items-center justify-content-center" size={25}>
+                <Card style={{ width: "100%", overflowY: "scroll", height: "25vh" }} subTitle="Etiquetas">
+                    <div className="card flex flex-wrap justify-content-center gap-2">
+                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
+                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
+                    </div>
+                </Card>
             </SplitterPanel>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={20}>
-                <div className="card flex flex-wrap justify-content-center gap-2">
-                    <p>
-                        Tagas
-                    </p>
-                </div>
-                <div className="card flex flex-wrap justify-content-center gap-2">
-                    <Tag value="Primary"></Tag>
-                    <Tag severity="success" value="Success"></Tag>
-                    <Tag severity="info" value="Info"></Tag>
-                    <Tag severity="warning" value="Warning"></Tag>
-                    <Tag severity="danger" value="Danger"></Tag>
-                    <Tag severity="secondary" value="Secondary"></Tag>
-                    <Tag severity="contrast" value="Contrast"></Tag>
-                </div>
-            </SplitterPanel>
-            <SplitterPanel className="flex align-items-center justify-content-center" size={5}>
-                Toolbar
+
+            <SplitterPanel className="flex align-items-center justify-content-center" size={10}>
+                <center>
+                    <div>
+                        <button style={{ fontSize: '2rem', margin: "0.5rem" }} className="p-link inline-flex justify-around align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+                            <i className="pi pi-cog text-2xl"></i>
+                        </button>
+                        <button style={{ fontSize: '2rem', margin: "0.5rem" }} className="p-link inline-flex justify-around align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+                            <i className="pi pi-question-circle text-2xl"></i>
+                        </button>
+                        <button style={{ fontSize: '2rem', margin: "0.5rem" }} className="p-link inline-flex justify-around align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+                            <i className="pi pi-folder text-2xl"></i>
+                        </button>
+                        <button style={{ fontSize: '2rem', margin: "0.5rem" }} className="p-link inline-flex justify-around align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+                            <i className="pi pi-home text-2xl"></i>
+                        </button>
+                    </div>
+                </center>
             </SplitterPanel>
         </Splitter>
     )

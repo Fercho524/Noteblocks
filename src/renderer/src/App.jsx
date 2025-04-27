@@ -1,60 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import ConfigToolbar from './components/ConfigToolbar';
-import { Splitter, SplitterPanel } from 'primereact/splitter';
-import { ScrollPanel } from 'primereact/scrollpanel';
-import EditorView from './components/EditorView';
-
-
-import "primereact/resources/themes/soho-dark/theme.css";
 import 'primeicons/primeicons.css';
+import "primereact/resources/themes/soho-dark/theme.css";
 
-import { Button } from 'primereact/button';
+import React, { useState, useEffect } from 'react';
 
-import { Toolbar } from 'primereact/toolbar';
+import { Splitter, SplitterPanel } from 'primereact/splitter';
 
-import mainIcon from './images/logo.svg'
 import NotebookSidebar from './components/NotebookSidebar';
+import NoteSidebar from './components/NoteSidebar';
+import EditorView from './components/EditorView';
+import MDToolbar from './components/MDToolbar';
 
 
 function App() {
-  const [files, setFiles] = useState([]);
-  const [date, setDate] = useState(null);
-
-  useEffect(() => {
-    window.api.getFiles('/home/darkplayer/Documentos/Notas').then(setFiles);
-  }, []);
-
+  
+  const [tabs, setTabs] = useState({})
+  const [places, setPlaces] = useState([])
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [baseDir, setBaseDir] = useState(null)
+  const [currentDir, setCurrentDir] = useState(baseDir)
 
 
   return (
     <Splitter style={{ height: '100vh' }}>
-      <SplitterPanel className="flex align-items-center justify-content-center" size={15} minSize={10}>
+      {/* Notebooks */}
+      <SplitterPanel className="flex align-items-center justify-content-center" size={17} minSize={10}>
         <NotebookSidebar />
       </SplitterPanel>
-
-      <SplitterPanel className="flex align-items-center justify-content-center" size={15} minSize={10}>
-        Notes
+      {/* Notes and Files */}
+      <SplitterPanel className="flex align-items-center justify-content-center" size={18} minSize={10}>
+        <NoteSidebar />
       </SplitterPanel>
-
-      <SplitterPanel size={70}>
-
-        <Splitter layout="vertical">
-
-
-
-          <SplitterPanel size={93}>
-            <EditorView />
-          </SplitterPanel>
-
-          <SplitterPanel className="flex align-items-center justify-content-center" size={7}>
-            <Toolbar start={"fd"} end={"endContent"} center={"Center"} style={{ width: "100%" }} />
-
-          </SplitterPanel>
-
-        </Splitter>
-
+      {/* Editor */}
+      <SplitterPanel size={65}>
+        <EditorView/>
       </SplitterPanel>
-
     </Splitter>
   );
 }

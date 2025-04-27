@@ -14,8 +14,70 @@
   <script src="styles/katex/contrib/auto-render.js"></script>
 
   <style>
-    body,html,#root {
+    body,
+    html,
+    #root {
       margin: 0% !important;
+      overflow-y: hidden;
+    }
+
+    .p-tabview-panels {
+      padding: 0px;
+    }
+
+    .note-selector {
+      border-radius: 0.5rem;
+      cursor: pointer;
+      padding: 20px;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      /* Centra verticalmente */
+    }
+
+    .note-selector:hover {
+      background: var(--primary-color);
+    }
+
+
+    /* Personalizar todo el scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      /* Más delgado */
+    }
+
+    /* Fondo del scrollbar */
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      /* Semitransparente */
+      border-radius: 10px;
+      /* Bordes redondeados */
+    }
+
+    /* El "thumb" o el desplazador */
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      /* Color bonito para el thumb */
+      border-radius: 10px;
+      /* Redondeado */
+      border: 2px solid transparent;
+      /* Espacio interno */
+      background-clip: padding-box;
+      /* Que respete el borde */
+    }
+
+    /* Cuando estás hover sobre el thumb */
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-color);
+      /* Un poco más opaco al pasar el mouse */
+    }
+
+    .cm-content,.editor, .cm-activeLine, .code {
+      word-break: break-word !important;
+      background: transparent !important;
+      overflow-wrap: break-word !important; 
+      white-space: normal !important;
     }
   </style>
 </head>
@@ -23,6 +85,7 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  
 </body>
 
 </html>
