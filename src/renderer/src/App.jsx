@@ -12,14 +12,6 @@ import MDToolbar from './components/MDToolbar';
 
 
 function App() {
-  
-  const [tabs, setTabs] = useState({})
-  const [places, setPlaces] = useState([])
-  const [selectedFile, setSelectedFile] = useState(null)
-  const [baseDir, setBaseDir] = useState(null)
-  const [currentDir, setCurrentDir] = useState(baseDir)
-
-
   return (
     <Splitter style={{ height: '100vh' }}>
       {/* Notebooks */}

@@ -4,21 +4,15 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { html2MarkDown } from '../utils/markdowwn2HTML';
 import MDToolbar from './MDToolbar';
 import CodeMirror from '@uiw/react-codemirror';
-import mermaid from 'mermaid';
 import { EditorView } from '@codemirror/view';
-
-
+import { markdownLanguage, markdown } from '@codemirror/lang-markdown';
 import { drawSelection } from '@codemirror/view';
-
-import { markdownLanguage,markdown } from '@codemirror/lang-markdown';
-
-import katex from "katex";
-import "katex/dist/katex.min.css";
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 
 function renderMath(content) {
-  if (!content) return "";
+  if (!content) return '';
 
-  // Primero las ecuaciones de bloque ($$...$$)
   content = content.replace(/\$\$([^$]+)\$\$/g, (_, tex) => {
     try {
       return katex.renderToString(tex, { displayMode: true });
@@ -28,7 +22,6 @@ function renderMath(content) {
     }
   });
 
-  // Luego las ecuaciones en línea ($...$)
   content = content.replace(/\$([^$]+)\$/g, (_, tex) => {
     try {
       return katex.renderToString(tex, { displayMode: false });
@@ -41,26 +34,58 @@ function renderMath(content) {
   return content;
 }
 
-
 export default function EditorMarkdown() {
-  const scrollableTabs = [
-    { title: "Tab 1" },
-    { title: "Tab 2" },
-    { title: "Tab 3" }
-  ];
-
-  const [content, setContent] = useState("");
-  const [mode, setMode] = useState("split");
-
+  const [tabs, setTabs] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
+  const editorViewRef = useRef(null);
+
 
   useEffect(() => {
-    if (renderedRef.current) {
-      const html = html2MarkDown(content);    // Markdown a HTML
-      const htmlWithMath = renderMath(html);   // Luego procesa LaTeX en el HTML
+    const loadHtml = async () => {
+      if (!tabs[activeIndex] || !renderedRef.current) return;
+      const currentDir = await window.api.getCurrentDir(); // Pides el currentDir
+      const html = await html2MarkDown(tabs[activeIndex].content || '', currentDir);
+      const htmlWithMath = renderMath(html);
       renderedRef.current.innerHTML = htmlWithMath;
+    };
+
+    loadHtml();
+  }, [tabs, activeIndex, mode]);
+
+  useEffect(() => {
+    const onFile = async (e) => {
+      const fileName = e.detail.fileName;
+      const idx = tabs.findIndex(t => t.key === fileName);
+      if (idx >= 0) {
+        setActiveIndex(idx);
+      } else {
+        const content = await window.api.readFile(fileName);
+        setTabs(prev => [...prev, {
+          key: fileName,
+          title: fileName,
+          content,
+          temporary: true
+        }]);
+        setActiveIndex(tabs.length);
+      }
+    };
+    window.addEventListener('file-selected', onFile);
+    return () => window.removeEventListener('file-selected', onFile);
+  }, [tabs]);
+
+  const pinTab = (index) => {
+    setTabs(prev => prev.map((t, i) => i === index ? { ...t, temporary: false } : t));
+  };
+
+  const closeTab = (e) => {
+    const index = e.index;
+    setTabs((prev) => prev.filter((_, i) => i !== index));
+    if (activeIndex >= index) {
+      setActiveIndex(Math.max(0, activeIndex - 1));
     }
-  }, [content]);
+  };
 
   const getDisplay = (target) => {
     if (mode === 'split') return 'block';
@@ -69,81 +94,118 @@ export default function EditorMarkdown() {
     return 'none';
   };
 
-  <MDToolbar mode={mode} setMode={setMode} />
+  useEffect(() => {
+    const handlePaste = async (event) => {
+      if (!editorViewRef.current) return;
+      const { items } = event.clipboardData;
+      for (let item of items) {
+        if (item.type.indexOf('image') === 0) {
+          event.preventDefault();
+          const file = item.getAsFile();
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64 = reader.result.split(',')[1];
+            const relPath = await window.api.saveClipboardImage(base64);
+            const snippet = `![pasted image](${relPath})`;
+            const view = editorViewRef.current;
+            const pos = view.state.selection.main.head;
+            view.dispatch({
+              changes: { from: pos, insert: snippet },
+              selection: { anchor: pos + snippet.length }
+            });
+            // onChange will sync content
+          };
+          reader.readAsDataURL(file);
+          break;
+        }
+      }
+    };
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [activeIndex]);
 
   return (
-    <TabView style={{ width: "100%", margin: "0px", padding: "0px" }} scrollable>
-      {scrollableTabs.map((tab) => (
-        <TabPanel style={{ margin: "0px", padding: "0px" }} size={100} key={tab.title} header={tab.title} closable>
-          <Splitter style={{ margin: "0px", padding: "0px" }} layout="vertical">
-            <SplitterPanel style={{ margin: "0px", padding: "0px" }} className="flex align-items-center justify-content-center" size={15}>
+    <TabView
+      style={{  margin:0, padding:0 }}
+      scrollable
+      activeIndex={activeIndex}
+      onTabChange={e => setActiveIndex(e.index)}
+      onTabClose={closeTab}
+    >
+      {tabs.map((tab,idx) => (
+        <TabPanel
+          key={tab.key}
+          header={
+            <div
+              onDoubleClick={()=>pinTab(idx)}
+              style={{ display:'flex', alignItems:'center', cursor:'pointer' }}
+            >
+              {tab.title}
+              {tab.temporary && <span style={{ marginLeft:4 }}>*</span>}
+            </div>
+          }
+          closable
+          style={{ margin:0, padding:0 }}
+        >
+          <Splitter layout="vertical" style={{ margin:0, padding:0 }}>
+            <SplitterPanel
+              style={{ margin:0, padding:0 }}
+              className="flex align-items-center justify-content-center"
+              size={15}
+            >
               <MDToolbar mode={mode} setMode={setMode} />
             </SplitterPanel>
-            <SplitterPanel style={{ margin: "0px", padding: "0px" }} size={85}>
+            <SplitterPanel style={{ margin:0, padding:0 }} size={85}>
               <Splitter>
-                <SplitterPanel style={{ display: getDisplay('editor') }} className="flex align-items-center justify-content-center" size={50}>
+                <SplitterPanel
+                  className="flex align-items-center justify-content-center"
+                  size={50}
+                  style={{ display:getDisplay('editor') }}
+                >
                   <CodeMirror
                     id="code"
-                    style={{
-                      background: "transparent !important",
-                      width: "100%",
-                      height: "80vh",
-                      border: "none",
-                      outline: "none",
-                      overflowY: "scroll",
-                      overflowX: "hidden",
-                      marginBottom: "0px",
-                      padding: "0rem",
-                      wordBreak: "break-word", // Aunque no siempre basta
-                      overflowWrap: "break-word",
-                      whiteSpace: "pre-wrap", 
-                      
-                    }}
+                    value={tab.content}
                     height="85vh"
-                    value={content}
-                    options={
-                      {
-                        lineNumbers: true,
-                        bracketMatching: true,
-                        lineBreak: true,
-                        lineWrapping: true,
-                      }
-                    }
-                    extensions={[markdown({ 
-                      base: markdownLanguage }),
+                    style={{
+                      background:'transparent', width:'100%', height:'80vh',
+                      border:'none', outline:'none', overflowY:'scroll',
+                      marginBottom:0, padding:0
+                    }}
+                    options={{
+                      lineNumbers:true, bracketMatching:true,
+                      lineWrapping:true
+                    }}
+                    extensions={[
+                      markdown({ base:markdownLanguage }),
                       EditorView.lineWrapping,
                       drawSelection()
                     ]}
-                    theme='dark'
-                    onChange={React.useCallback((val, viewUpdate) => {
-                      setContent(val);
-                    }, [])}
+                    theme="dark"
+                    onCreateEditor={(view) => { editorViewRef.current = view; }}
+                    onChange={(value, viewUpdate) => {
+                      setTabs(prev => prev.map((t,i) => i===idx ? {...t, content:value} : t));
+                    }}
                   />
                 </SplitterPanel>
-                <SplitterPanel style={{ display: getDisplay('preview') }} className="flex align-items-center justify-content-center" size={50}>
+                <SplitterPanel
+                  className="flex align-items-center justify-content-center"
+                  size={50}
+                  style={{ display:getDisplay('preview') }}
+                >
                   <div
-                    id="rendered"
                     ref={renderedRef}
                     style={{
-                      width: "100%",
-                      overflowY: "scroll",
-                      padding: "1rem",
-                      height: "80vh",
-                      wordBreak: "break-word",
-                      overflowWrap: "break-word",
-                      whiteSpace: "normal",
+                      width:'100%', overflowY:'scroll', padding:'1rem',
+                      height:'80vh', wordBreak:'break-word',
+                      overflowWrap:'break-word', whiteSpace:'normal'
                     }}
                   />
                 </SplitterPanel>
               </Splitter>
             </SplitterPanel>
           </Splitter>
-
         </TabPanel>
       ))}
-
     </TabView>
   );
 }
-
-

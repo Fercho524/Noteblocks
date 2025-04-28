@@ -1,27 +1,29 @@
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 
-import { join } from 'path';
+const appName = 'Noteblocks';
+const userDataPath = path.join(os.homedir(), '.noteblocks');
+const configPath = path.join(userDataPath, 'config.json');
 
-
-function getUserDocumentsDir() {
+export function getUserDocumentsDir() {
     const homeDir = os.homedir();
 
-    // En Windows típicamente: C:\Users\<user>\Documents
-    // En Linux: /home/<user>/Documentos o /Documents
     if (process.platform === 'win32') {
         return path.join(homeDir, 'Documents');
     } else {
         const docsLinux = path.join(homeDir, 'Documentos');
         return fs.existsSync(docsLinux)
             ? docsLinux
-            : path.join(homeDir, 'Documents'); // fallback si no existe
+            : path.join(homeDir, 'Documents');
     }
 }
 
-function loadConfig() {
+export function loadConfig() {
+    console.log(configPath)
     try {
         if (fs.existsSync(configPath)) {
+            
             return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         }
     } catch (e) {
@@ -31,24 +33,36 @@ function loadConfig() {
     const defaultDir = getUserDocumentsDir();
 
     const defaultConfig = {
-        currentOpenedFiles: [],
-        currentFile: '',
-        favoriteDirs: [defaultDir],
-        currentBaseDir: defaultDir,
-        currentDir: defaultDir,
-        fileHistory: [],
-        globalThemeCSSPath: '',
-        editorThemeCSSPath: '',
-        editorMonospaceFont: '',
-        editorLanguage: '',
-        dateFormat: '',
-        sintaxTheme: '',
-        pdfSize: 'A4',
-        editorFontSize: '',
-        autosave: true,
+        appname: appName,
+        version: "0.0.0",
+        state: {
+            fixedTabs: [],
+            currentFile: "",
+            repositories: [],
+            selectedRepo: "",
+            currentDir: defaultDir,
+            fileHistory: [],
+            editorView: "split"
+        },
+        interface: {
+            themeAutoDetect: true,
+            themeVariant: "",
+            themeAccent: "",
+            language: "",
+            autosave: true
+        },
+        editor: {
+            dateFormat: "",
+            pdfExportFormat: "",
+            editorFontSize: "",
+            monoSpaceFont: "",
+            editorSintaxTheme: "",
+            renderedMarkdownCustomCSS: "",
+            spellChecker: ""
+        },
         keybindings: [
-            { keys: ['ctrl', 's'], action: 'save-file' },
-            { keys: ['ctrl', 'v'], action: 'paste-image' }
+            { keys: ["ctrl", "s"], action: "save-file" },
+            { keys: ["ctrl", "v"], action: "paste-image" }
         ]
     };
 
@@ -57,6 +71,6 @@ function loadConfig() {
     return defaultConfig;
 }
 
-function saveConfig(config) {
+export function saveConfig(config) {
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
 }

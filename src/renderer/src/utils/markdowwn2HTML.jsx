@@ -1,4 +1,5 @@
-export function html2MarkDown(md) {
+
+export function html2MarkDown(md,currentDir) {
     let html = md;
 
     const rules = [
@@ -55,11 +56,13 @@ export function html2MarkDown(md) {
     );
     html = html.replace(/ class="(?:ol|ul)"/g, '');
 
+    console.log(currentDir)
+
     html = html.replace(
         /<img src="([^"]+)" alt="([^"]+)">/g,
         (m, src, alt) => {
             if (!/^[a-z]+:\/\//i.test(src)) {
-                src = `file://${window.currentDir}/${src}`;
+                src = `file://${currentDir}/${src}`;
             }
             return `<img src="${src}" alt="${alt}">`;
         }

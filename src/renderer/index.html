@@ -6,8 +6,10 @@
   <title>Electron</title>
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:;" />
+    
 
+ 
   <!-- Latex Rendering -->
   <link rel="stylesheet" href="styles/katex/katex.min.css" />
   <script src="styles/katex/katex.min.js"></script>
@@ -116,6 +118,8 @@
     .cm-editor .cm-selectionBackground {
       background-color: var(--primary-color) !important;
     }
+
+    
   </style>
 </head>
 
