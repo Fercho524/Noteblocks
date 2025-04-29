@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 
 
-export default function RepoManager({ visible, setVisible }) {
+export default function RepoManager({ visible, setVisible,setTabs }) {
   const [repos, setRepos] = useState([])
   const [selectedRepo, setSelectedRepo] = useState(null)
 
@@ -27,6 +27,7 @@ export default function RepoManager({ visible, setVisible }) {
     console.log(repos)
     await window.api.changeRepo(repo);
     window.dispatchEvent(new CustomEvent('directory-changed'));
+    setTabs([])
   };
 
 

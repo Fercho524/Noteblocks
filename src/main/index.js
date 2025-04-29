@@ -118,11 +118,11 @@ ipcMain.handle('change-repo', (ev, newRepo) => {
 
 // File Functions
 ipcMain.handle('read-file', (ev, fileName) =>
-  fs.readFileSync(path.join(currentDir, fileName), 'utf-8')
+  fs.readFileSync(path.join(fileName), 'utf-8')
 );
 
 ipcMain.handle('save-file', (ev, fileName, content) => {
-  fs.writeFileSync(path.join(currentDir, fileName), content, 'utf-8');
+  fs.writeFileSync(fileName, content, 'utf-8');
   return { success: true };
 });
 

@@ -4,6 +4,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 
 import CodeMirror from '@uiw/react-codemirror';
+import { keymap } from '@codemirror/view';
 import { EditorView } from '@codemirror/view';
 import { drawSelection } from '@codemirror/view';
 import { markdownLanguage, markdown } from '@codemirror/lang-markdown';
@@ -17,32 +18,43 @@ import MDToolbar from './MDToolbar';
 
 function renderMath(content) {
   if (!content) return '';
-  // bloque de ecuaciones
+
+  // bloque de ecuaciones ($$ ... $$)
   content = content.replace(/\$\$([^$]+)\$\$/g, (_, tex) => {
-    try { return katex.renderToString(tex, { displayMode: true }); }
-    catch { return `<span style="color:red;">${tex}</span>`; }
+    try {
+      return katex.renderToString(tex, { displayMode: true });
+    } catch {
+      return `<span style="color:red;">${tex}</span>`;
+    }
   });
-  // inline
+
+  // inline math ($ ... $)
   content = content.replace(/\$([^$]+)\$/g, (_, tex) => {
-    try { return katex.renderToString(tex, { displayMode: false }); }
-    catch { return `<span style="color:red;">${tex}</span>`; }
+    // Verificar si el contenido parece realmente una fórmula
+    const isProbablyMath = /[a-zA-Z\\^_\+\-\*\=]/.test(tex.trim());
+    if (!isProbablyMath) {
+      // No parece math real: no cambiar
+      return `$${tex}$`;
+    }
+    try {
+      return katex.renderToString(tex, { displayMode: false });
+    } catch {
+      return `<span style="color:red;">${tex}</span>`;
+    }
   });
+
   return content;
 }
 
 
-export default function EditorMarkdown() {
-  // Tabs
-  const [tabs, setTabs] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-
+export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIndex }) {
   // Code - Rendered
   const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
 
 
-  // Render preview on active tab
+  // Autorender markdown
   useEffect(() => {
     if (tabs.length === 0) return;
     const tab = tabs[activeIndex];
@@ -54,55 +66,7 @@ export default function EditorMarkdown() {
     })();
   }, [tabs, activeIndex, mode]);
 
-
-  // File Selection Open Tab
-  useEffect(() => {
-    const handler = async (e) => {
-      const { fileName, filePath } = e.detail;
-      const currentDir = await window.api.getCurrentDir();
-      const content = await window.api.readFile(fileName);
-
-      setTabs(prev => {
-        const idx = prev.findIndex(t => t.key === filePath);
-        if (idx >= 0) {
-          setActiveIndex(idx);
-          return prev;
-        }
-        const updated = [...prev, { key: filePath, title: fileName, fileDir: currentDir, content }];
-        setActiveIndex(updated.length - 1);
-        return updated;
-      });
-    };
-
-    window.addEventListener('file-selected', handler);
-    return () => window.removeEventListener('file-selected', handler);
-  }, []);
-
-  // Pin tab on double click
-  const pinTab = (idx) => {
-    setTabs(prev =>
-      prev.map((t, i) => (i === idx ? { ...t, temporary: false } : t))
-    );
-    setActiveIndex(idx);
-  };
-
-
-  // Close tab with functional update
-  const closeTab = (e) => {
-    setTabs(prev => {
-      const filtered = prev.filter((_, i) => i !== e.index);
-      setActiveIndex(old => {
-        if (filtered.length === 0) return 0;
-        if (old > e.index) return old - 1;
-        if (old === e.index) return Math.max(0, e.index - 1);
-        return old;
-      });
-      return filtered;
-    });
-  };
-
-
-  // Paste image at cursor
+  // Paste Image
   useEffect(() => {
     const handlePaste = async (ev) => {
       const view = editorViewRef.current;
@@ -128,7 +92,8 @@ export default function EditorMarkdown() {
     return () => document.removeEventListener('paste', handlePaste);
   }, [activeIndex]);
 
-  // Determine panel display
+
+  // Toggle Preview | Editor
   const getDisplay = (target) => {
     if (mode === 'split') return 'block';
     if (mode === 'code' && target === 'editor') return 'block';
@@ -137,6 +102,23 @@ export default function EditorMarkdown() {
   };
 
 
+  // Tabs
+  function removeTab(indexToRemove) {
+    setTabs(prevTabs => {
+      const newTabs = prevTabs.filter((_, index) => index !== indexToRemove);
+
+      // Ajustar activeIndex si es necesario
+      if (newTabs.length === 0) {
+        setActiveIndex(0);
+      } else if (indexToRemove >= newTabs.length) {
+        setActiveIndex(newTabs.length - 1);
+      } else {
+        setActiveIndex(indexToRemove);
+      }
+
+      return newTabs;
+    });
+  }
 
 
   return (
@@ -145,22 +127,26 @@ export default function EditorMarkdown() {
         style={{ margin: 0, padding: 0, width: "65vw" }}
         scrollable
         activeIndex={activeIndex}
-        onTabChange={e => setActiveIndex(e.index)}
-
-        onTabClose={closeTab}
+        onTabClose={(e) => { removeTab(e.index) }}
+        onTabChange={(e) => { setActiveIndex(e.index) }}
       >
         {tabs.map((tab, idx) => (
           <TabPanel
             key={tab.key}
             header={
               <div
-                onClick={() => pinTab(idx)}
                 style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
               >
                 {tab.title}
                 {tab.temporary && <span style={{ marginLeft: 4 }}>*</span>}
               </div>
             }
+            onMouseDown={(e) => {
+              if (e.button === 1) { // 1 = Middle click
+                e.preventDefault(); // Previene el scroll por click medio
+                removeTab(idx);
+              }
+            }}
             closable
             style={{ margin: 0, padding: 0 }}
           >
@@ -182,7 +168,7 @@ export default function EditorMarkdown() {
                     <CodeMirror
                       id="code"
                       value={tab.content}
-                      height="85vh"
+                      height="80vh"
                       style={{
                         background: 'transparent',
                         width: '100%',
@@ -191,7 +177,67 @@ export default function EditorMarkdown() {
                         outline: 'none'
                       }}
                       options={{ lineNumbers: true, bracketMatching: true, lineWrapping: true }}
-                      extensions={[markdown({ base: markdownLanguage }), EditorView.lineWrapping, drawSelection()]}
+                      extensions={[
+                        markdown({ base: markdownLanguage }),
+                        EditorView.lineWrapping,
+                        drawSelection(),
+                        keymap.of([
+                          {
+                            key: "Mod-s", // "Mod" es Ctrl en Windows/Linux, Cmd en MacOS
+                            preventDefault: true,
+                            run: async (view) => {
+                              try {
+                                const currentContent = view.state.doc.toString(); // Obtiene el texto actual
+                                await window.api.saveFile(tab.filePath, currentContent);
+                                console.log("Archivo guardado exitosamente:", tab.filePath);
+                              } catch (error) {
+                                console.error("Error al guardar el archivo:", error);
+                              }
+                              return true; // Indica que el atajo fue manejado
+                            }
+                          },
+                          {
+                            key: "Mod-b",
+                            preventDefault: true,
+                            run: (view) => {
+                              const { state, dispatch } = view;
+                              const selection = state.selection.main;
+
+                              // No hay selección
+                              if (selection.empty) return false;
+
+                              const selectedText = state.doc.sliceString(selection.from, selection.to);
+                              const isBold = /^\*\*(.*)\*\*$/.test(selectedText);
+
+                              let replacement = '';
+                              if (isBold) {
+                                // Ya está en negrita, quitamos los asteriscos
+                                replacement = selectedText.slice(2, -2);
+                              } else {
+                                // Lo ponemos en negrita
+                                replacement = `**${selectedText}**`;
+                              }
+
+                              dispatch({
+                                changes: {
+                                  from: selection.from,
+                                  to: selection.to,
+                                  insert: replacement
+                                },
+                                selection: {
+                                  anchor: selection.from + (isBold ? 0 : 2),
+                                  head: selection.to + (isBold ? -4 : 2)
+                                },
+                                scrollIntoView: true
+                              });
+
+                              return true;
+                            }
+                          }
+
+                          // Aquí podrías añadir más keybindings personalizados si quieres
+                        ])
+                      ]}
                       theme="dark"
                       onCreateEditor={view => { editorViewRef.current = view; }}
                       onChange={(value) => setTabs(prev => prev.map((t, i) => i === idx ? { ...t, content: value } : t))}
@@ -208,7 +254,7 @@ export default function EditorMarkdown() {
                       style={{
                         width: '100%',
                         padding: '1rem',
-                        height: '85vh',
+                        height: '80vh',
                         wordBreak: 'break-word',
                         overflowWrap: 'anywhere',
                         whiteSpace: 'pre-wrap',

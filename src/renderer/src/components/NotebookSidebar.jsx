@@ -9,7 +9,7 @@ import RepoSelector from './RepoSelector'
 import ConfigUI from './ConfigUI';
 
 
-export default function NotebookSidebar() {
+export default function NotebookSidebar({setTabs}) {
     // Directorios
     const [dirs, setDirs] = useState([])
 
@@ -61,7 +61,7 @@ export default function NotebookSidebar() {
                     </div>
                     <div style={{ cursor: "pointer" }} onClick={() => setRepoSelectVisible(true)}>
                         <i style={{ paddingLeft: "0.9rem", marginRight: "0.5rem", marginBottom: "0.5rem" }} className='pi pi-folder'></i>Repositories
-                        <RepoSelector visible={repoSelectVisible} setVisible={setRepoSelectVisible} />
+                        <RepoSelector visible={repoSelectVisible} setVisible={setRepoSelectVisible} setTabs={setTabs}/>
                     </div>
                 </Card>
             </SplitterPanel>

@@ -10,20 +10,25 @@ import NoteSidebar from './components/NoteSidebar';
 import EditorMarkdown from './components/EditorView';
 
 
+
 function App() {
+  // Tabs
+  const [tabs,setTabs] = useState([])
+  const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <Splitter style={{ height: '100vh' }}>
       {/* Notebooks */}
       <SplitterPanel className="flex align-items-center justify-content-center" size={17} minSize={10}>
-        <NotebookSidebar />
+        <NotebookSidebar setTabs={setTabs}/>
       </SplitterPanel>
       {/* Notes and Files */}
       <SplitterPanel className="flex align-items-center justify-content-center" size={18} minSize={10}>
-        <NoteSidebar />
+        <NoteSidebar tabs={tabs} setTabs={setTabs} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/>
       </SplitterPanel>
       {/* Editor */}
       <SplitterPanel size={65}>
-        <EditorMarkdown/>
+        <EditorMarkdown tabs={tabs} setTabs={setTabs} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/>
       </SplitterPanel>
     </Splitter>
   );

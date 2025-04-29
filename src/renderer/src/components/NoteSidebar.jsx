@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -7,7 +8,7 @@ import { VirtualScroller } from 'primereact/virtualscroller';
 import { classNames } from 'primereact/utils';
 
 
-function NoteSidebar() {
+function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
     const [files, setFiles] = useState([]);
 
     const loadFiles = async () => {
@@ -18,12 +19,35 @@ function NoteSidebar() {
     const onFileClick = async (fileName) => {
         const currentDir = await window.api.getCurrentDir();
         const filePath = `${currentDir}/${fileName}`;
-        console.log(filePath)
+        const content = await window.api.readFile(filePath);
 
-        window.dispatchEvent(
-            new CustomEvent('file-selected', { detail: { filePath, fileName } })
-        );
+        const newTab = {
+            key: uuidv4(),
+            filePath: filePath,
+            fileDir: currentDir,
+            title: fileName,
+            content: content
+        };
+
+        setTabs(prevTabs => {
+            // Verifica si ya existe una pestaña con ese archivo (por filePath, o por título si prefieres)
+            const existingIndex = prevTabs.findIndex(tab => tab.filePath === newTab.filePath);
+
+            if (existingIndex !== -1) {
+                // Ya existe, enfoca esa
+                setActiveIndex(existingIndex);
+                return prevTabs;
+            }
+
+            const updatedTabs = [...prevTabs, newTab];
+
+            // Enfoca la nueva pestaña al final
+            setActiveIndex(updatedTabs.length - 1);
+
+            return updatedTabs;
+        });
     };
+
 
     useEffect(() => {
         loadFiles();
