@@ -8,12 +8,14 @@ import { keymap } from '@codemirror/view';
 import { EditorView } from '@codemirror/view';
 import { drawSelection } from '@codemirror/view';
 import { markdownLanguage, markdown } from '@codemirror/lang-markdown';
+import { Toast } from 'primereact/toast';
 
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { html2MarkDown } from '../utils/markdowwn2HTML';
 
 import MDToolbar from './MDToolbar';
+
 
 
 function renderMath(content) {
@@ -52,6 +54,15 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
   const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
+
+  // Messages
+  const [showSavedMessage, SetShowSavedMessage] = useState(false)
+  const toast = useRef(null);
+
+
+  const show = () => {
+    toast.current.show({ severity: 'success', summary: 'Saved File', detail: 'File saved successfully' });
+  };
 
 
   // Autorender markdown
@@ -120,6 +131,16 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
     });
   }
 
+  if (tabs.length === 0) {
+    return (
+      <div className="flex flex-column align-items-center justify-content-center" style={{ height: '100%',padding: "3rem" }}>
+        <i className="pi pi-book" style={{ fontSize: '4rem', marginBottom: '1rem', color: '#ccc' }}></i>
+        <h2>Bienvenido a Noteblocks</h2>
+        <p>Comienza abriendo o creando una nota desde la barra lateral.</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="card">
@@ -156,7 +177,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                 className="flex align-items-center justify-content-center"
                 size={15}
               >
-                <MDToolbar mode={mode} setMode={setMode} />
+                <MDToolbar mode={mode} setMode={setMode} showSavedMessage={showSavedMessage} />
               </SplitterPanel>
               <SplitterPanel style={{ margin: 0, padding: 0 }} size={85}>
                 <Splitter>
@@ -190,6 +211,9 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                                 const currentContent = view.state.doc.toString(); // Obtiene el texto actual
                                 await window.api.saveFile(tab.filePath, currentContent);
                                 console.log("Archivo guardado exitosamente:", tab.filePath);
+
+                                show()
+
                               } catch (error) {
                                 console.error("Error al guardar el archivo:", error);
                               }
@@ -266,6 +290,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                 </Splitter>
               </SplitterPanel>
             </Splitter>
+            <Toast ref={toast} />
           </TabPanel>
         ))}
       </TabView>

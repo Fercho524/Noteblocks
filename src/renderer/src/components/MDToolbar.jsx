@@ -3,8 +3,10 @@ import React from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import { SelectButton } from 'primereact/selectbutton';
 
+import { Message } from 'primereact/message';
 
-function MDToolbar({ mode, setMode }) {
+
+function MDToolbar({ mode, setMode,showSavedMessage }) {
     const viewModeOptions = [
         { icon: 'pi pi-code', value: 'code' },
         { icon: 'pi pi-pause', value: 'split' },
@@ -101,8 +103,8 @@ function MDToolbar({ mode, setMode }) {
     )
 
     const rightToolbar = (
-        <div>
-
+        <div className="card flex flex-wrap align-items-center justify-content-center gap-3">
+            
         </div>
     )
 

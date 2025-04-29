@@ -12,13 +12,17 @@ const api = {
   changeDirectory: (name) => ipcRenderer.invoke('change-directory', name),
   getCurrentDir: () => ipcRenderer.invoke('get-current-dir'),
 
-  // Archivos
+  // Archivos 
   readFile: (fileName) => ipcRenderer.invoke('read-file', fileName),
   saveFile: (fileName, content) => ipcRenderer.invoke('save-file', fileName, content),
   createFile: (name) => ipcRenderer.invoke('create-file', name),
   renameItem: (oldName, newName) => ipcRenderer.invoke('rename-item', oldName, newName),
   createDirectory: (name) => ipcRenderer.invoke('create-directory', name),
   deleteItem: (name) => ipcRenderer.invoke('delete-item', name),
+  resetCurrentDir: ( ) => ipcRenderer.invoke('reset-current-dir'),
+  openDirectory: async (path) => {
+    await ipcRenderer.invoke('open-directory', path);
+  },
 
   // Markdown & recursos
   saveClipboardImage: (base64Data) => ipcRenderer.invoke('save-clipboard-image', base64Data),

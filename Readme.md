@@ -1,5 +1,10 @@
 # Noteblocks
 
-A simple markdown editor gui
+A simple markdown editor in electron and react
 
-![alt text](image-4.png)
+Editor
+![alt text](image-5.png)
+
+Múltiples fuentes
+![alt text](image-6.png)
+

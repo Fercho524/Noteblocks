@@ -127,14 +127,28 @@ ipcMain.handle('save-file', (ev, fileName, content) => {
 });
 
 ipcMain.handle('create-file', (ev, name) => {
-  fs.writeFileSync(path.join(currentDir, name), '', 'utf-8');
+  fs.writeFileSync(path.join(name), '', 'utf-8');
 });
 
 ipcMain.handle('rename-item', (ev, oldName, newName) => {
   fs.renameSync(
-    path.join(currentDir, oldName),
-    path.join(currentDir, newName)
+    path.join(oldName),
+    path.join(newName)
   );
+});
+
+ipcMain.handle('open-directory', async (event, dirPath) => {
+  try {
+    if (fs.existsSync(dirPath)) {
+      await shell.openPath(dirPath); // Funciona tanto en Windows como en Linux
+      return true;
+    } else {
+      throw new Error("Directory does not exist.");
+    }
+  } catch (err) {
+    console.error("Error opening directory:", err);
+    return false;
+  }
 });
 
 
@@ -145,11 +159,11 @@ ipcMain.handle('get-current-dir', async () => {
 });
 
 ipcMain.handle('create-directory', (ev, name) => {
-  fs.mkdirSync(path.join(currentDir, name));
+  fs.mkdirSync(path.join(name));
 });
 
 ipcMain.handle('delete-item', (ev, name) => {
-  const p = path.join(currentDir, name);
+  const p = path.join(name);
   if (fs.lstatSync(p).isDirectory()) fs.rmdirSync(p, { recursive: true });
   else fs.unlinkSync(p);
 });
@@ -172,6 +186,13 @@ ipcMain.handle('change-directory', (ev, name) => {
     config.state.currentDir = currentDir;
     saveConfig(config);
   }
+  return { currentDir };
+});
+
+ipcMain.handle('reset-current-dir', (ev) => {
+  currentDir = config.state.selectedRepo;
+  config.state.currentDir = currentDir;
+  saveConfig(config);
   return { currentDir };
 });
 

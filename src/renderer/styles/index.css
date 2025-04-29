@@ -89,3 +89,8 @@ html,
     max-width: 100% !important;
 }
 
+
+
+.p-card-body {
+    height: 100%;
+}
