@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
+
 import { Sidebar } from 'primereact/sidebar';
 import { ListBox } from 'primereact/listbox';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
-import { classNames } from 'primereact/utils';
+
 
 export default function RepoManager({ visible, setVisible }) {
   const [repos, setRepos] = useState([])
   const [selectedRepo, setSelectedRepo] = useState(null)
+
 
   // Carga inicial de configuración
   useEffect(() => {
@@ -18,17 +20,21 @@ export default function RepoManager({ visible, setVisible }) {
     });
   }, []);
 
+
   // Seleccionar repositorio
   const handleSelect = async (repo) => {
     setSelectedRepo(repo);
+    console.log(repos)
     await window.api.changeRepo(repo);
     window.dispatchEvent(new CustomEvent('directory-changed'));
   };
+
 
   // Eliminar repositorio
   const handleRemove = async (repo) => {
     const filtered = repos.filter(r => r !== repo);
     setRepos(filtered);
+
     // Actualizamos configuración sin el repo eliminado
     await window.api.updateConfig({
       state: {
@@ -40,6 +46,7 @@ export default function RepoManager({ visible, setVisible }) {
       }
     });
   };
+
 
   // Agregar nuevo repositorio
   const handleAdd = async () => {

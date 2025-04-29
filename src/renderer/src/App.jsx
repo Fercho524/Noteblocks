@@ -8,7 +8,6 @@ import { Splitter, SplitterPanel } from 'primereact/splitter';
 import NotebookSidebar from './components/NotebookSidebar';
 import NoteSidebar from './components/NoteSidebar';
 import EditorMarkdown from './components/EditorView';
-import MDToolbar from './components/MDToolbar';
 
 
 function App() {

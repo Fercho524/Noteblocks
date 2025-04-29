@@ -3,130 +3,19 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Electron</title>
-  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <title>Noteblocks</title>
+
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:;" />
-    
 
- 
-  <!-- Latex Rendering -->
-  <link rel="stylesheet" href="styles/katex/katex.min.css" />
-  <script src="styles/katex/katex.min.js"></script>
-  <script src="styles/katex/contrib/auto-render.js"></script>
-
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/index.css">
   <link rel="stylesheet" href="styles/editor.css">
-
-  <style>
-    body,
-    html,
-    #root {
-      margin: 0% !important;
-      overflow-y: hidden;
-    }
-
-    .p-tabview-panels {
-      padding: 0px;
-    }
-
-    .note-selector {
-      border-radius: 0.5rem;
-      cursor: pointer;
-      padding: 20px;
-      margin-bottom: 0.5rem;
-      margin-top: 0.5rem;
-      display: flex;
-      align-items: center;
-      /* Centra verticalmente */
-    }
-
-    .note-selector:hover {
-      background: var(--primary-color);
-    }
-
-
-    /* Personalizar todo el scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      /* Más delgado */
-    }
-
-    /* Fondo del scrollbar */
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      /* Semitransparente */
-      border-radius: 10px;
-      /* Bordes redondeados */
-    }
-
-    /* El "thumb" o el desplazador */
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      /* Color bonito para el thumb */
-      border-radius: 10px;
-      /* Redondeado */
-      border: 2px solid transparent;
-      /* Espacio interno */
-      background-clip: padding-box;
-      /* Que respete el borde */
-    }
-
-    /* Cuando estás hover sobre el thumb */
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary-color);
-      /* Un poco más opaco al pasar el mouse */
-    }
-
-    .cm-content,
-    .editor,
-    .cm-activeLine,
-    .code {
-      overflow-wrap: break-word;
-      word-break: break-word;
-      background: transparent !important;
-
-    }
-
-    #code * {
-      overflow-wrap: break-word;
-      word-break: break-word;
-      background: transparent !important;
-    }
-
-    /* Para navegadores basados en WebKit/Chromium */
-    .cm-content ::selection {
-      background: var(--primary-color) !important;
-
-      color: #fff !important;
-      /* asegura contraste */
-    }
-
-    .cm-content::-moz-selection {
-      background: var(--primary-color) !important;
-      color: #fff !important;
-    }
-
-    /* También cubrimos el layer interno de selección de CM6 */
-    .cm-editor .cm-selectionBackground {
-      background-color: var(--primary-color) !important;
-    }
-
-    .cm-selectionBackground {
-      background-color: var(--primary-color) !important;
-    }
-
-    .cm-editor .cm-selectionBackground {
-      background-color: var(--primary-color) !important;
-    }
-
-    
-  </style>
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-
 </body>
 
 </html>

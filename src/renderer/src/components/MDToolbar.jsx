@@ -1,10 +1,7 @@
 import React from 'react';
+
 import { Toolbar } from 'primereact/toolbar';
-import { Divider } from 'primereact/divider';
-
-
 import { SelectButton } from 'primereact/selectbutton';
-
 
 
 function MDToolbar({ mode, setMode }) {

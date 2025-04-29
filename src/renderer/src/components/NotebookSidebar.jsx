@@ -40,6 +40,9 @@ export default function NotebookSidebar() {
     // Config Screen
     const [configVisible, setConfigVisible] = useState(false);
 
+    // Etiquetas
+    const [tags, setTags] = useState(["comida", "tareas", "peliculas"])
+    const tagsColors = ["success", "info", "warning", "danger", "primary", "secondary", "contrast"]
 
     return (
         <Splitter style={{ height: '100vh' }} layout="vertical">
@@ -97,27 +100,17 @@ export default function NotebookSidebar() {
             <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={24}>
                 <Card style={{ width: "100%", overflowY: "scroll" }} subTitle="Etiquetas">
                     <div className="card flex flex-wrap justify-content-center gap-2">
-                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} value="Primary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="success" value="Success"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="info" value="Info"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="warning" value="Warning"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="danger" value="Danger"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="secondary" value="Secondary"></Tag>
-                        <Tag style={{ margin: "0.2rem" }} severity="contrast" value="Contrast"></Tag>
+                        {tags.map(tag => {
+                            const randomSeverity = tagsColors[Math.floor(Math.random() * tagsColors.length)];
+                            return (
+                                <Tag
+                                    key={tag}
+                                    style={{ margin: "0.2rem" }}
+                                    severity={randomSeverity}
+                                    value={tag}
+                                />
+                            );
+                        })}
                     </div>
                 </Card>
             </SplitterPanel>

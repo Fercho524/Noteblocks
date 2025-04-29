@@ -5,6 +5,7 @@
   font-size: 15px;
   line-height: 1.7;
   color: #e0e0e0;
+  text-align: justify;
 }
 
 #rendered h1 {
@@ -97,7 +98,35 @@
 }
 
 #rendered img {
-  max-width: 100%;
+  width: 100%;
   margin: 1em 0;
   border-radius: 6px;
+}
+
+
+#rendered {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+#rendered img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+#rendered pre {
+  background: #1e1e1e;
+  /* Fondo de código, opcional */
+  padding: 1rem;
+  overflow-x: auto;
+  /* Scroll horizontal solo en bloques de código */
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+#rendered code {
+  white-space: pre;
 }
