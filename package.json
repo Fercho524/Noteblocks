@@ -1,10 +1,41 @@
 {
-  "name": "react",
+  "name": "noteblocks",
   "version": "1.0.0",
-  "description": "An Electron application with React",
+  "description": "A markdown editor without complex storage formats",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": "fercho524",
+  "appId": "com.fercho524.noteblocks",
+  "productName": "Noteblocks",
   "homepage": "https://electron-vite.org",
+  "build": {
+    "appId": "com.fercho524.noteblocks",
+    "productName": "Noteblocks",
+    "directories": {
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**",
+      "dist/**",
+      "resources/**",
+      "package.json",
+      "node_modules/**"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "icon.png",
+      "category": "Utility",
+      "maintainer": "fercho524"
+    },
+    "appImage": {
+      "artifactName": "${name}-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://example.com/auto-updates"
+    }
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

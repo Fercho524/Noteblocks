@@ -63,9 +63,12 @@ function createWindow() {
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    //console.log("ENTORNO : ",process.env['ELECTRON_RENDERER_URL']) => http://localhost:5173
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadURL(`file://${path.join(__dirname, '..', 'rendered', 'index.html')}`);
+    // ../../out/renderer/index.html  
+    mainWindow.loadFile(path.join(__dirname, '..','renderer','index.html'));
+    //mainWindow.loadURL(`file://${path.join(__dirname, '..','..','out','rendered','index.html')}`);
   }
 }
 
