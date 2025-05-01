@@ -8,11 +8,13 @@ import { app, shell, BrowserWindow, Menu, ipcMain, dialog } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
 import icon from '../../resources/icon.png?asset'
-import { loadConfig, saveConfig } from './config';
+import { loadConfig, saveConfig,getUserCSS } from './config';
 
 
 // Configuración
 let config = loadConfig();
+
+
 
 let currentDir = config.state.currentDir || '';
 let selectedRepo = config.state.selectedRepo || '';
@@ -100,6 +102,8 @@ app.on('window-all-closed', () => {
 // App Config
 ipcMain.handle('get-config', () => config);
 
+ipcMain.handle('get-user-styles', () => {getUserCSS()});
+
 ipcMain.handle('update-config', (ev, updates) => {
   config = { ...config, ...updates };
   saveConfig(config);
@@ -173,7 +177,7 @@ ipcMain.handle('delete-item', (ev, name) => {
 
 ipcMain.handle('get-directory-data', () => {
   const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-  const dirs = entries.filter(e => e.isDirectory()).map(e => e.name);
+  const dirs = entries.filter(e => e.isDirectory() && e.name != ".resources").map(e => e.name);
   const files = entries
     .filter(e => e.isFile() && /\.(txt|md)$/i.test(e.name))
     .map(e => e.name);

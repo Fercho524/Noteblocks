@@ -6,6 +6,18 @@ const appName = 'Noteblocks';
 const userDataPath = path.join(os.homedir(), '.noteblocks');
 const configPath = path.join(userDataPath, 'config.json');
 
+
+
+export function getUserCSS() {
+    const editorCSSPath = path.join(userDataPath, 'editor.css');
+    const indexCSSPath = path.join(userDataPath, 'index.css');
+
+    return {
+        indexCSSPath : fs.existsSync(indexCSSPath) ? indexCSSPath : null,
+        editorCSS : fs.existsSync(editorCSSPath) ? indexCSSPath : null
+    }
+}
+
 export function getUserDocumentsDir() {
     const homeDir = os.homedir();
 
@@ -23,7 +35,7 @@ export function loadConfig() {
     console.log(configPath)
     try {
         if (fs.existsSync(configPath)) {
-            
+
             return JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         }
     } catch (e) {

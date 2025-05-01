@@ -6,6 +6,7 @@ const api = {
   getConfig: () => ipcRenderer.invoke('get-config'),
   updateConfig: (updates) => ipcRenderer.invoke('update-config', updates),
   changeRepo: (repo) => ipcRenderer.invoke('change-repo', repo),
+  getUserStylesPath: () => ipcRenderer.invoke('get-user-styles'),
 
   // Navegación de directorios
   getDirectoryData: () => ipcRenderer.invoke('get-directory-data'),

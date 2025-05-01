@@ -176,7 +176,12 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
             header: 'Create file',
             defaultFocus: 'accept',
             accept: async () => {
-                const newName = newFilenameRef.current;
+                let newName = newFilenameRef.current;
+
+                if (!newName.includes(".md")){
+                    newName+=".md"
+                }
+
                 const { currentDir, filePath: newPath } = await getFullPath(newName);
                 console.log(newPath)
                 // Create directory
