@@ -177,7 +177,7 @@ export default function NotebookSidebar({ setTabs }) {
         <>
             <Splitter style={{ height: '100vh' }} layout="vertical">
                 {/* Places */}
-                <SplitterPanel style={{ overflowY: "scroll", width: "100%", padding: "0px" }} className="flex align-items-center justify-content-center" size={20}>
+                <SplitterPanel style={{ overflowY: "scroll", width: "100%", padding: "0px" }} className="flex align-items-center justify-content-center" size={25}>
                     <Card style={{ padding: "0px", width: "100%" }} subTitle="Noteblocks">
                         <div
                             style={{ cursor: "pointer" }}
@@ -207,7 +207,7 @@ export default function NotebookSidebar({ setTabs }) {
                 <SplitterPanel
                     style={{ overflowY: 'scroll' }}
                     className="flex align-items-center justify-content-center"
-                    size={50}
+                    size={65}
                 >
                     <Card style={{ padding: '0px', width: '100%', margin: "0px" }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -249,7 +249,7 @@ export default function NotebookSidebar({ setTabs }) {
                     </Card>
                 </SplitterPanel>
                 {/* Tags */}
-                <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={25}>
+                {/* <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={25}>
                     <Card style={{ width: "100%", overflowY: "scroll" }} subTitle="Etiquetas">
                         <div className="card flex flex-wrap justify-content-center gap-2">
                             {tags.map(tag => {
@@ -265,7 +265,7 @@ export default function NotebookSidebar({ setTabs }) {
                             })}
                         </div>
                     </Card>
-                </SplitterPanel>
+                </SplitterPanel> */}
                 {/* Config Toolbar */}
                 <SplitterPanel style={{ overflowY: "scroll" }} className="flex align-items-center justify-content-center" size={10}>
                     <center>

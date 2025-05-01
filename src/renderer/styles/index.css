@@ -52,7 +52,8 @@ html,
 
 
 /* Code Editor */
-.cm-content,.cm-editor * {
+.cm-content,
+.cm-editor * {
     background: transparent !important;
 }
 
@@ -93,4 +94,99 @@ html,
 
 .p-card-body {
     height: 100%;
+}
+
+/* Numeración de figuras */
+
+body {
+    counter-reset: figure;
+    /* Inicia el contador */
+}
+
+figure {
+    counter-increment: figure;
+    /* Incrementa por cada figure */
+    margin: 1em;
+    text-align: center;
+}
+
+figcaption::before {
+    content: "Figura " counter(figure) ": ";
+    font-weight: bold;
+}
+
+/* TOC */
+/* Contenedor principal */
+.toc {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    /* semi-transparente */
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: inherit;
+    /* hereda color del tema */
+    font-size: 0.9rem;
+    overflow: auto;
+}
+
+/* Reset de contadores */
+.toc {
+    counter-reset: h1;
+}
+
+/* Listas limpias y anidado */
+.toc ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0.1em;
+}
+
+/* Nivel 1 */
+.toc>ul>li {
+    counter-increment: h1;
+}
+
+.toc>ul>li::before {
+    content: counter(h1) ". ";
+    font-weight: bold;
+}
+
+/* Nivel 2 */
+.toc>ul>li>ul {
+    counter-reset: h2;
+}
+
+.toc>ul>li>ul>li {
+    counter-increment: h2;
+}
+
+.toc>ul>li>ul>li::before {
+    content: counter(h1) "." counter(h2) " ";
+}
+
+/* Nivel 3 */
+.toc ul ul ul {
+    counter-reset: h3;
+}
+
+.toc ul ul ul>li {
+    counter-increment: h3;
+}
+
+.toc ul ul ul>li::before {
+    content: counter(h1) "." counter(h2) "." counter(h3) " ";
+}
+
+/* Nivel 4 (opcional extender igual que el 3) */
+.toc ul ul ul ul {
+    counter-reset: h4;
+}
+
+.toc ul ul ul ul>li {
+    counter-increment: h4;
+}
+
+.toc ul ul ul ul>li::before {
+    content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) " ";
 }

@@ -1,5 +1,77 @@
+function generateTOC(md) {
+    const lines = md.split(/\r?\n/);
+    const headings = [];
+  
+    // Encuentra la línea donde está [[toc]]
+    const tocLine = lines.findIndex(line => line.trim() === '[[toc]]');
+    if (tocLine === -1) {
+      return ''; // Si no hay marcador, no hay TOC
+    }
+  
+    // Recorre sólo las líneas *después* de [[toc]]
+    for (let i = tocLine + 1; i < lines.length; i++) {
+      const match = lines[i].match(/^(#{1,6})\s+(.*)$/);
+      if (match) {
+        const level = match[1].length;
+        const text = match[2].trim();
+        const id = text
+          .toLowerCase()
+          .replace(/[^\w]+/g, '-')
+          .replace(/(^-+|-+$)/g, '');
+        headings.push({ level, text, id });
+      }
+    }
+  
+    // Si no hay encabezados posteriores, devolvemos cadena vacía
+    if (!headings.length) {
+      return '';
+    }
+  
+    // Construir HTML de la TOC (números LaTeX-style)
+    let toc = '<div class="toc"><strong>Tabla de contenidos</strong><ul>';
+    let prevLevel = headings[0].level;
+    // Asegúrate de iniciar el contador en el nivel más bajo que uses, p.ej. 1
+    toc += ''; 
+  
+    // Generar listas anidadas con numeración
+    const counters = []; // un array de contadores por nivel
+  
+    headings.forEach(({ level, text, id }) => {
+      // Ajusta el array de contadores
+      counters[level] = (counters[level] || 0) + 1;
+      // Reinicia contadores de niveles inferiores
+      for (let lv = level + 1; lv < counters.length; lv++) {
+        counters[lv] = 0;
+      }
+  
+      // Ajustar nesting de UL
+      if (level > prevLevel) {
+        toc += '<ul>'.repeat(level - prevLevel);
+      } else if (level < prevLevel) {
+        toc += '</ul>'.repeat(prevLevel - level);
+      }
+  
+      // Construye el número concatenando desde nivel 1 hasta current
+      const number = counters.slice(1, level + 1).join('.');
+      toc += `<li><a href="#${id}">${number} ${text}</a></li>`;
+  
+      prevLevel = level;
+    });
+  
+    // Cierra todas las listas abiertas
+    toc += '</ul>'.repeat(prevLevel - (headings[0].level - 1));
+    toc += '</div>\n';
+    return toc;
+  }
+  
 
-export function html2MarkDown(md,currentDir) {
+
+export function html2MarkDown(md, currentDir) {
+    if (/\[\[toc\]\]/.test(md)) {
+        const tocHTML = generateTOC(md);
+        md = md.replace(/\[\[toc\]\]/g, tocHTML);
+    }
+
     let html = md;
 
     const rules = [
@@ -64,7 +136,13 @@ export function html2MarkDown(md,currentDir) {
             if (!/^[a-z]+:\/\//i.test(src)) {
                 src = `file://${currentDir}/${src}`;
             }
-            return `<img src="${src}" alt="${alt}">`;
+
+            if (alt != "pasted image") {
+                return `<figure><img src="${src}" alt="${alt}"><center><figcaption>${alt}</figcaption><center/></figure>`;
+            } else {
+                return `<img src="${src}" alt="${alt}">`;
+            }
+
         }
     );
 

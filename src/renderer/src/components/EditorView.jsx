@@ -9,8 +9,10 @@ import { EditorView } from '@codemirror/view';
 import { drawSelection } from '@codemirror/view';
 import { markdownLanguage, markdown } from '@codemirror/lang-markdown';
 import { Toast } from 'primereact/toast';
-
 import katex from 'katex';
+
+import { materialDark } from '@uiw/codemirror-theme-material';
+
 import 'katex/dist/katex.min.css';
 import { html2MarkDown } from '../utils/markdowwn2HTML';
 
@@ -54,6 +56,8 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
   const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
+
+  const [theme,setTheme] = useState(materialDark)
 
   // Messages
   const [showSavedMessage, SetShowSavedMessage] = useState(false)
@@ -133,7 +137,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
 
   if (tabs.length === 0) {
     return (
-      <div className="flex flex-column align-items-center justify-content-center" style={{ height: '100%',padding: "3rem" }}>
+      <div className="flex flex-column align-items-center justify-content-center" style={{ height: '100%', padding: "3rem" }}>
         <i className="pi pi-book" style={{ fontSize: '4rem', marginBottom: '1rem', color: '#ccc' }}></i>
         <h2>Bienvenido a Noteblocks</h2>
         <p>Comienza abriendo o creando una nota desde la barra lateral.</p>
@@ -199,6 +203,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                       }}
                       options={{ lineNumbers: true, bracketMatching: true, lineWrapping: true }}
                       extensions={[
+                        theme,
                         markdown({ base: markdownLanguage }),
                         EditorView.lineWrapping,
                         drawSelection(),
@@ -262,7 +267,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                           // Aquí podrías añadir más keybindings personalizados si quieres
                         ])
                       ]}
-                      theme="dark"
+                      theme={theme}
                       onCreateEditor={view => { editorViewRef.current = view; }}
                       onChange={(value) => setTabs(prev => prev.map((t, i) => i === idx ? { ...t, content: value } : t))}
                     />
