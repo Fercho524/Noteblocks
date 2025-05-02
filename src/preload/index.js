@@ -21,6 +21,7 @@ const api = {
   createDirectory: (name) => ipcRenderer.invoke('create-directory', name),
   deleteItem: (name) => ipcRenderer.invoke('delete-item', name),
   resetCurrentDir: ( ) => ipcRenderer.invoke('reset-current-dir'),
+  pathJoin: (...segments) => ipcRenderer.invoke('path-join', ...segments),
   openDirectory: async (path) => {
     await ipcRenderer.invoke('open-directory', path);
   },

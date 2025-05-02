@@ -187,3 +187,34 @@ export function html2MarkDown(md, currentDir) {
 
   return html;
 }
+
+
+export const renderMath = (content) => {
+  if (!content) return '';
+
+  // bloque de ecuaciones ($$ ... $$)
+  content = content.replace(/\$\$([^$]+)\$\$/g, (_, tex) => {
+    try {
+      return katex.renderToString(tex, { displayMode: true });
+    } catch {
+      return `<span style="color:red;">${tex}</span>`;
+    }
+  });
+
+  // inline math ($ ... $)
+  content = content.replace(/\$([^$]+)\$/g, (_, tex) => {
+    // Verificar si el contenido parece realmente una fórmula
+    const isProbablyMath = /[a-zA-Z\\^_\+\-\*\=]/.test(tex.trim());
+    if (!isProbablyMath) {
+      // No parece math real: no cambiar
+      return `$${tex}$`;
+    }
+    try {
+      return katex.renderToString(tex, { displayMode: false });
+    } catch {
+      return `<span style="color:red;">${tex}</span>`;
+    }
+  });
+
+  return content;
+}

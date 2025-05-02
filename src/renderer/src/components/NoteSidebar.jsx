@@ -1,37 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
-
 import { VirtualScroller } from 'primereact/virtualscroller';
 
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { ContextMenu } from 'primereact/contextmenu';
 
+import { getFullPath } from '../utils/getFullPath';
+
 
 function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
     const [files, setFiles] = useState([]);
+
+    // Search File
     const [fileFilter, setFileFilter] = useState("")
 
+    // Selection
     const [selectedFilePath, setSelectedFilePath] = useState("")
     const [selectedFileName, setSelectedFileName] = useState("")
-    const [newFilename, setNewFilename] = useState("")
 
+    // Rename and create
+    const [newFilename, setNewFilename] = useState("")
 
     // Confirm Post message
     const toast = useRef(null);
     const newFilenameRef = useRef("");
-
-    // Utils
-    const getFullPath = async (fileName) => {
-        const currentDir = await window.api.getCurrentDir();
-        const filePath = `${currentDir}/${fileName}`;
-
-        return { currentDir, filePath }
-    }
 
     // File Loading and Filtering
     const loadFiles = async () => {
@@ -178,8 +176,8 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
             accept: async () => {
                 let newName = newFilenameRef.current;
 
-                if (!newName.includes(".md")){
-                    newName+=".md"
+                if (!newName.includes(".md")) {
+                    newName += ".md"
                 }
 
                 const { currentDir, filePath: newPath } = await getFullPath(newName);
@@ -198,22 +196,22 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
                     title: newName,
                     content: ""
                 };
-        
+
                 setTabs(prevTabs => {
                     // Verifica si ya existe una pestaña con ese archivo (por filePath, o por título si prefieres)
                     const existingIndex = prevTabs.findIndex(tab => tab.filePath === newTab.filePath);
-        
+
                     if (existingIndex !== -1) {
                         // Ya existe, enfoca esa
                         setActiveIndex(existingIndex);
                         return prevTabs;
                     }
-        
+
                     const updatedTabs = [...prevTabs, newTab];
-        
+
                     // Enfoca la nueva pestaña al final
                     setActiveIndex(updatedTabs.length - 1);
-        
+
                     return updatedTabs;
                 });
 
@@ -268,19 +266,15 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
 
     // Renamed File value
     useEffect(() => {
-        // Solo inicializar si aún está vacío
         if (newFilename === "") {
             setNewFilename(selectedFileName);
         }
     }, [selectedFileName]);
 
-    // useEffect(() => {
-    //     console.log('Valor actualizado:', newFilename);
-    // }, [newFilename]);
-
 
     return (
         <div className="card flex justify-content-center" style={{ height: '98%', width: '90%', position: 'relative' }}>
+            {/* Search Input */}
             <div style={{ margin: '1rem', width: '100%' }} className="p-inputgroup flex-1">
                 <InputText placeholder="Search a note"
                     onChange={(e) => setFileFilter(e.target.value)}
@@ -288,29 +282,39 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
                 <Button icon="pi pi-search" className="p-button-primary" />
             </div>
 
+            {/* File List */}
             <VirtualScroller
                 items={files}
                 itemSize={50}
                 className="border-1 surface-border border-round"
-                style={{ width: '100%', margin: '1rem', marginBottom: '2rem', height: '100%' }}
-                itemTemplate={(item, options) => {
-                    const cn = classNames('flex align-items-center note-selector', {
-                        'surface-hover': options.odd
-                    });
-                    return (
-                        <div
-                            className={cn}
-                            style={{ height: options.props.itemSize + 'px', cursor: 'pointer' }}
-                            onClick={() => onFileClick(item)}
-                            onContextMenu={(event) => onRightClick(event, item)}
-                        >
-                            <i className="pi pi-file" style={{ fontSize: '1rem', margin: '0 0.5rem' }} />
-                            <span>{item}</span>
-                        </div>
-                    );
+                style={{
+                    width: '100%',
+                    margin: '1rem',
+                    marginBottom: '2rem',
+                    height: '100%'
                 }}
+                itemTemplate={
+                    (item, options) => {
+                        const cn = classNames('flex align-items-center note-selector', { 'surface-hover': options.odd });
+
+                        return (
+                            <div
+                                className={cn}
+                                style={{
+                                    height: options.props.itemSize + 'px',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => onFileClick(item)}
+                                onContextMenu={(event) => onRightClick(event, item)}
+                            >
+                                <i className="pi pi-file" style={{ fontSize: '1rem', margin: '0 0.5rem' }} />
+                                <span>{item}</span>
+                            </div>
+                        );
+                    }}
             />
 
+            {/* Create new file */}
             <Button
                 icon="pi pi-file-edit"
                 className="p-button-rounded p-button-primary"
@@ -325,10 +329,10 @@ function NoteSidebar({ tabs, setTabs, activeIndex, setActiveIndex }) {
                 tooltipOptions={{ position: 'left' }}
             />
 
+            {/* Notification toast and other elements */}
             <Toast ref={toast} />
             <ContextMenu model={items} ref={cm} breakpoint="767px" />
         </div>
-
     );
 }
 

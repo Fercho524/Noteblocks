@@ -10,29 +10,21 @@ import NotebookSidebar from './components/NotebookSidebar';
 import NoteSidebar from './components/NoteSidebar';
 import EditorMarkdown from './components/EditorView';
 
-const styles = await window.api.getUserStylesPath()
-
-
-
 
 function App() {
-  console.log(styles)
-
   // Tabs
   const [tabs, setTabs] = useState([])
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const toast = useRef(null);
-
   // Avoid Default Keybindings
   useEffect(() => {
-    const handler = (e) => {
+    const closeTabDefault = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'w') {
         e.preventDefault();
       }
     };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    document.addEventListener('keydown', closeTabDefault);
+    return () => document.removeEventListener('keydown', closeTabDefault);
   });
 
   return (

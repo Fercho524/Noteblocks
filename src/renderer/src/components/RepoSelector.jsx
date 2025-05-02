@@ -6,10 +6,10 @@ import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 
 
-export default function RepoManager({ visible, setVisible,setTabs }) {
+export default function RepoManager({ visible, setVisible, setTabs }) {
+  // Estados
   const [repos, setRepos] = useState([])
   const [selectedRepo, setSelectedRepo] = useState(null)
-
 
   // Carga inicial de configuración
   useEffect(() => {
@@ -20,7 +20,6 @@ export default function RepoManager({ visible, setVisible,setTabs }) {
     });
   }, []);
 
-
   // Seleccionar repositorio
   const handleSelect = async (repo) => {
     setSelectedRepo(repo);
@@ -29,7 +28,6 @@ export default function RepoManager({ visible, setVisible,setTabs }) {
     window.dispatchEvent(new CustomEvent('directory-changed'));
     setTabs([])
   };
-
 
   // Eliminar repositorio
   const handleRemove = async (repo) => {
@@ -47,7 +45,6 @@ export default function RepoManager({ visible, setVisible,setTabs }) {
       }
     });
   };
-
 
   // Agregar nuevo repositorio
   const handleAdd = async () => {

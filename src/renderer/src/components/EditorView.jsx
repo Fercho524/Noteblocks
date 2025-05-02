@@ -2,71 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { Toast } from 'primereact/toast';
 
 import CodeMirror from '@uiw/react-codemirror';
 import { keymap } from '@codemirror/view';
 import { EditorView } from '@codemirror/view';
 import { drawSelection } from '@codemirror/view';
 import { markdownLanguage, markdown } from '@codemirror/lang-markdown';
-import { Toast } from 'primereact/toast';
-import katex from 'katex';
-
 import { materialDark } from '@uiw/codemirror-theme-material';
 
+import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { html2MarkDown } from '../utils/markdowwn2HTML';
+import { renderMath } from '../utils/markdowwn2HTML';
 
 import MDToolbar from './MDToolbar';
-
-
-
-function renderMath(content) {
-  if (!content) return '';
-
-  // bloque de ecuaciones ($$ ... $$)
-  content = content.replace(/\$\$([^$]+)\$\$/g, (_, tex) => {
-    try {
-      return katex.renderToString(tex, { displayMode: true });
-    } catch {
-      return `<span style="color:red;">${tex}</span>`;
-    }
-  });
-
-  // inline math ($ ... $)
-  content = content.replace(/\$([^$]+)\$/g, (_, tex) => {
-    // Verificar si el contenido parece realmente una fórmula
-    const isProbablyMath = /[a-zA-Z\\^_\+\-\*\=]/.test(tex.trim());
-    if (!isProbablyMath) {
-      // No parece math real: no cambiar
-      return `$${tex}$`;
-    }
-    try {
-      return katex.renderToString(tex, { displayMode: false });
-    } catch {
-      return `<span style="color:red;">${tex}</span>`;
-    }
-  });
-
-  return content;
-}
-
-function boldKeybind(view) {
-  const { state, dispatch } = view;
-  const sel = state.selection.main;
-  if (sel.empty) return false;
-  const text = state.doc.sliceString(sel.from, sel.to);
-  const isBold = /^\*\*(.*)\*\*$/.test(text);
-  const wrapped = isBold ? text.slice(2, -2) : `**${text}**`;
-  dispatch({
-    changes: { from: sel.from, to: sel.to, insert: wrapped },
-    selection: {
-      anchor: sel.from + (isBold ? 0 : 2),
-      head: sel.to + (isBold ? -4 : 2)
-    },
-    scrollIntoView: true
-  });
-  return true;
-}
 
 
 export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIndex }) {
@@ -75,18 +25,90 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
 
+  // Sintax Theme
   const [theme, setTheme] = useState(materialDark)
 
   // Messages
-  const [showSavedMessage, SetShowSavedMessage] = useState(false)
   const toast = useRef(null);
-
-
   const show = () => {
     toast.current.show({ severity: 'success', summary: 'Saved File', detail: 'File saved successfully' });
   };
 
+  // Layout
+  const editorLayout = {
+    tabs: {
+      width: 65,
+      height: 15,
+    },
+    editor: {
+      width: 65,
+      height: 80,
+    }
+  }
 
+  // Toggle Preview | Editor
+  const getDisplay = (target) => {
+    if (mode === 'split') return 'block';
+    if (mode === 'code' && target === 'editor') return 'block';
+    if (mode === 'preview' && target === 'preview') return 'block';
+    return 'none';
+  };
+
+  // Tabs
+  const removeTab = (indexToRemove) => {
+    setTabs(prevTabs => {
+      const newTabs = prevTabs.filter((_, index) => index !== indexToRemove);
+
+      // Ajustar activeIndex si es necesario
+      if (newTabs.length === 0) {
+        setActiveIndex(0);
+      } else if (indexToRemove >= newTabs.length) {
+        setActiveIndex(newTabs.length - 1);
+      } else {
+        setActiveIndex(indexToRemove);
+      }
+
+      return newTabs;
+    });
+  }
+
+  // Keybindings Actions
+  const boldKeybind = (view) => {
+    const { state, dispatch } = view;
+    const selection = state.selection.main;
+
+    // No hay selección
+    if (selection.empty) return false;
+
+    const selectedText = state.doc.sliceString(selection.from, selection.to);
+    const isBold = /^\*\*(.*)\*\*$/.test(selectedText);
+
+    let replacement = '';
+    if (isBold) {
+      // Ya está en negrita, quitamos los asteriscos
+      replacement = selectedText.slice(2, -2);
+    } else {
+      // Lo ponemos en negrita
+      replacement = `**${selectedText}**`;
+    }
+
+    dispatch({
+      changes: {
+        from: selection.from,
+        to: selection.to,
+        insert: replacement
+      },
+      selection: {
+        anchor: selection.from + (isBold ? 0 : 2),
+        head: selection.to + (isBold ? -4 : 2)
+      },
+      scrollIntoView: true
+    });
+
+    return true;
+  }
+
+  // Preview
   const updatePreview = async (text, fileDir) => {
     if (!renderedRef.current) return;
     const html = await html2MarkDown(text, fileDir);
@@ -143,34 +165,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
     return () => document.removeEventListener('paste', handlePaste);
   }, [activeIndex]);
 
-
-  // Toggle Preview | Editor
-  const getDisplay = (target) => {
-    if (mode === 'split') return 'block';
-    if (mode === 'code' && target === 'editor') return 'block';
-    if (mode === 'preview' && target === 'preview') return 'block';
-    return 'none';
-  };
-
-
-  // Tabs
-  function removeTab(indexToRemove) {
-    setTabs(prevTabs => {
-      const newTabs = prevTabs.filter((_, index) => index !== indexToRemove);
-
-      // Ajustar activeIndex si es necesario
-      if (newTabs.length === 0) {
-        setActiveIndex(0);
-      } else if (indexToRemove >= newTabs.length) {
-        setActiveIndex(newTabs.length - 1);
-      } else {
-        setActiveIndex(indexToRemove);
-      }
-
-      return newTabs;
-    });
-  }
-
+  // Welcome Message
   if (tabs.length === 0) {
     return (
       <div className="flex flex-column align-items-center justify-content-center" style={{ height: '100%', padding: "3rem" }}>
@@ -180,62 +175,6 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
       </div>
     );
   }
-
-
-  const boldKeybind = (view) => {
-    const { state, dispatch } = view;
-    const selection = state.selection.main;
-
-    // No hay selección
-    if (selection.empty) return false;
-
-    const selectedText = state.doc.sliceString(selection.from, selection.to);
-    const isBold = /^\*\*(.*)\*\*$/.test(selectedText);
-
-    let replacement = '';
-    if (isBold) {
-      // Ya está en negrita, quitamos los asteriscos
-      replacement = selectedText.slice(2, -2);
-    } else {
-      // Lo ponemos en negrita
-      replacement = `**${selectedText}**`;
-    }
-
-    dispatch({
-      changes: {
-        from: selection.from,
-        to: selection.to,
-        insert: replacement
-      },
-      selection: {
-        anchor: selection.from + (isBold ? 0 : 2),
-        head: selection.to + (isBold ? -4 : 2)
-      },
-      scrollIntoView: true
-    });
-
-    return true;
-  }
-
-
-  const editorLayout = {
-    tabs: {
-      width: 65,
-      height: 15,
-    },
-    editor: {
-      width: 65,
-      height: 80,
-    }
-  }
-
-  const handleBlur = async (e) => {
-    if (editorViewRef.current) {
-      const currentContent = editorViewRef.current.state.doc.toString();
-      await window.api.saveFile(tab.filePath, currentContent);
-      console.log('Archivo guardado automáticamente.');
-    }
-  };
 
   return (
     <div className="card">
@@ -247,14 +186,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
         onTabChange={(e) => { setActiveIndex(e.index) }}
       >
         {tabs.map((tab, idx) => {
-          const onBlur = async () => {
-            const view = editorViewRef.current;
-            if (!view) return;
-            const content = view.state.doc.toString();
-            await window.api.saveFile(tab.filePath, content);
-          };
-
-          // Keymaps específicos de esta pestaña
+          // Keybindings
           const km = keymap.of([
             {
               key: 'Mod-s',
@@ -262,7 +194,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
               run: async view => {
                 const content = view.state.doc.toString();
                 await window.api.saveFile(tab.filePath, content);
-                toast.current.show({ severity: 'success', summary: 'Guardado', detail: tab.title });
+                show()
                 return true;
               }
             },
@@ -272,11 +204,11 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
               run: boldKeybind
             },
             {
-              key: 'Mod-w',          // <-- Ctrl+W (Cmd+W en mac)
+              key: 'Mod-w',
               preventDefault: true,
               run: () => {
-                removeTab(idx);      // cierra esta pestaña
-                return true;         // marca que el atajo ha sido procesado
+                removeTab(idx);
+                return true;
               }
             }
           ]);
@@ -285,16 +217,14 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
             <TabPanel
               key={tab.key}
               header={
-                <div
-                  style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-                >
+                <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   {tab.title}
                   {tab.temporary && <span style={{ marginLeft: 4 }}>*</span>}
                 </div>
               }
               onMouseDown={(e) => {
-                if (e.button === 1) { // 1 = Middle click
-                  e.preventDefault(); // Previene el scroll por click medio
+                if (e.button === 1) {
+                  e.preventDefault();
                   removeTab(idx);
                 }
               }}
@@ -302,17 +232,20 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
               style={{ margin: 0, padding: 0 }}
             >
               <Splitter layout="vertical" style={{ margin: 0, padding: 0 }}>
+                {/* Toolbar */}
                 <SplitterPanel
-                  style={{ margin: 0, padding: 0,height: `${editorLayout.tabs.height}vh` }}
+                  style={{ margin: 0, padding: 0, height: `${editorLayout.tabs.height}vh` }}
                   className="flex align-items-center justify-content-center"
                   size={15}
                 >
-                  <MDToolbar mode={mode} setMode={setMode} showSavedMessage={showSavedMessage} style={{
+                  <MDToolbar mode={mode} setMode={setMode} style={{
                     height: `${editorLayout.tabs.height}vh`,
                   }} />
                 </SplitterPanel>
+                {/* Editor */}
                 <SplitterPanel style={{ margin: 0, padding: 0 }} size={85}>
                   <Splitter>
+                    {/* Code Mirror */}
                     <SplitterPanel
                       className="flex align-items-center justify-content-center"
                       size={50}
@@ -322,7 +255,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                         id="code"
                         key={tab.key}
                         value={tab.content}
-
+                        theme={theme}
                         height={`${editorLayout.editor.height}vh`}
                         style={{
                           background: 'transparent',
@@ -332,27 +265,6 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                           outline: 'none'
                         }}
                         options={{ lineNumbers: true, bracketMatching: true, lineWrapping: true }}
-
-
-                        extensions={[
-                          theme,
-                          markdown({ base: markdownLanguage }),
-                          EditorView.lineWrapping,
-                          drawSelection(),
-                          km,
-                          EditorView.updateListener.of(update => {
-                            if (update.docChanged) {
-                              const text = update.state.doc.toString();
-                              // actualizar preview inmediatamente
-                              updatePreview(text, tab.fileDir, renderedRef);
-                            }
-                          })
-                        ]}
-                        theme={theme}
-
-                        onChange={() => { }}
-
-
                         onCreateEditor={view => {
                           editorViewRef.current = view;
 
@@ -372,12 +284,25 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                             setTabs(prev =>
                               prev.map((t, i) => i === idx ? { ...t, content: txt } : t)
                             );
-                            //toast.current.show({ severity: 'success', summary: 'Guardado', detail: tab.title });
                           });
                         }}
-                      // onChange={(value) => setTabs(prev => prev.map((t, i) => i === idx ? { ...t, content: value } : t))}
+                        extensions={[
+                          theme,
+                          markdown({ base: markdownLanguage }),
+                          EditorView.lineWrapping,
+                          drawSelection(),
+                          km,
+                          EditorView.updateListener.of(update => {
+                            if (update.docChanged) {
+                              const text = update.state.doc.toString();
+                              // actualizar preview inmediatamente
+                              updatePreview(text, tab.fileDir, renderedRef);
+                            }
+                          })
+                        ]}
                       />
                     </SplitterPanel>
+                    {/* Preview */}
                     <SplitterPanel
                       className="flex align-items-center justify-content-center"
                       size={50}

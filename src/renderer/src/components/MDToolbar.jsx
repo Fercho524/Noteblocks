@@ -3,10 +3,8 @@ import React from 'react';
 import { Toolbar } from 'primereact/toolbar';
 import { SelectButton } from 'primereact/selectbutton';
 
-import { Message } from 'primereact/message';
 
-
-function MDToolbar({ mode, setMode,showSavedMessage }) {
+function MDToolbar({ mode, setMode }) {
     const viewModeOptions = [
         { icon: 'pi pi-code', value: 'code' },
         { icon: 'pi pi-pause', value: 'split' },

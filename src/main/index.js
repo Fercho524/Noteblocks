@@ -100,6 +100,11 @@ app.on('window-all-closed', () => {
 
 
 // App Config
+ipcMain.handle('path-join',(_event,...args)=> {
+  return path.join(...args)
+})
+
+
 ipcMain.handle('get-config', () => config);
 
 ipcMain.handle('get-user-styles', () => {getUserCSS()});
