@@ -19,11 +19,12 @@ import { renderMath } from '../utils/markdowwn2HTML';
 import MDToolbar from './MDToolbar';
 
 
-export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIndex }) {
+export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIndex, sintaxTheme, setSintaxTheme, appTheme, setAppTheme }) {
   // Code - Rendered
   const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
+  const [vh, setVh] = useState(window.innerHeight <= 768 ? 80 : 85);
 
   // Sintax Theme
   const [theme, setTheme] = useState(materialDark)
@@ -126,6 +127,15 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
       });
     renderedRef.current.innerHTML = rendered;
   };
+
+  // Resize
+  useEffect(() => {
+    const onResize = () => {
+      setVh(window.innerHeight <= 768 ? 80 : 85);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // Autorender markdown
   useEffect(() => {
@@ -238,7 +248,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                   className="flex align-items-center justify-content-center"
                   size={15}
                 >
-                  <MDToolbar mode={mode} setMode={setMode} style={{
+                  <MDToolbar mode={mode} setMode={setMode} sintaxTheme={sintaxTheme} setSintaxTheme={setSintaxTheme} appTheme={appTheme} setAppTheme={setAppTheme} style={{
                     height: `${editorLayout.tabs.height}vh`,
                   }} />
                 </SplitterPanel>
@@ -255,8 +265,8 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                         id="code"
                         key={tab.key}
                         value={tab.content}
-                        theme={theme}
-                        height={`${editorLayout.editor.height}vh`}
+                        theme={sintaxTheme}
+                        height={`${vh}vh`}
                         style={{
                           background: 'transparent',
                           width: '100%',
@@ -314,7 +324,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                         style={{
                           width: '100%',
                           padding: '2rem',
-                          height: `${editorLayout.editor.height}vh`,
+                          height: `${vh}vh`,
                           wordBreak: 'break-word',
                           overflowWrap: 'anywhere',
                           whiteSpace: 'pre-wrap',

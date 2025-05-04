@@ -56,10 +56,10 @@ html,
 
 
 /* Code Editor */
-.cm-content,
+/* .cm-content,
 .cm-editor * {
     background: transparent !important;
-}
+} */
 
 .cm-content ::selection {
     background: var(--primary-color) !important;

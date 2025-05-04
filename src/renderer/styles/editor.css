@@ -214,8 +214,6 @@
   content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) " ";
 }
 
-.cm-editor {
-  background-color: transparent;
-}
+
 
 
