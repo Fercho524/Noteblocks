@@ -1,0 +1,120 @@
+body,
+html,
+#root {
+    margin: 0% !important;
+    padding: 0% !important;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+
+/* Note Selection */
+.note-selector {
+    border-radius: 0.5rem;
+    cursor: pointer;
+    padding: 20px;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.note-selector:hover {
+    background: var(--primary-color);
+}
+
+.active-note {
+    background: var(--primary-color);
+}
+
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* Pestañas */
+.p-tabview-panels {
+    margin: 0%;
+    padding: 0%;
+}
+
+
+/* Code Editor */
+/* .cm-content,
+.cm-editor * {
+    background: transparent !important;
+} */
+
+.cm-content ::selection {
+    background: var(--primary-color) !important;
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+.cm-content *::-moz-selection {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+/* También cubrimos el layer interno de selección de CM6 */
+.cm-content .cm-selectionBackground {
+    background: var(--primary-color) !important;
+}
+
+.cm-selectionBackground {
+    background: var(--primary-color) !important;
+}
+
+.cm-content .cm-selectionBackground {
+    background: var(--primary-color) !important;
+}
+
+
+/* Rendered markdown */
+#rendered {
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    white-space: pre-wrap !important;
+    max-width: 100% !important;
+}
+
+
+
+.p-card-body {
+    height: 100%;
+}
+
+/* Numeración de figuras */
+
+body {
+    counter-reset: figure;
+    /* Inicia el contador */
+}
+
+figure {
+    counter-increment: figure;
+    /* Incrementa por cada figure */
+    margin: 1em;
+    text-align: center;
+}
+
+figcaption::before {
+    content: "Figura " counter(figure) ": ";
+    font-weight: bold;
+}

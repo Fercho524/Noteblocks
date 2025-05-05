@@ -1,0 +1,219 @@
+/* Estilos markdown exclusivos para #content */
+
+#rendered {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+#rendered h1 {
+  font-size: 1.8em;
+  margin-top: 1.5em;
+  border-bottom: 2px solid #444;
+  padding-bottom: 0.3em;
+}
+
+#rendered h2 {
+  font-size: 1.5em;
+  margin-top: 1.2em;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.2em;
+}
+
+#rendered h3 {
+  font-size: 1.2em;
+  margin-top: 1em;
+  font-weight: 600;
+}
+
+#rendered p {
+  margin: 1em 0;
+}
+
+#rendered ul,
+#rendered ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+#rendered li {
+  margin-bottom: 0.5em;
+}
+
+#rendered blockquote {
+  border-left: 4px solid #888;
+  padding-left: 12px;
+  font-style: italic;
+  margin: 1em 0;
+}
+
+#rendered code {
+  background-color: #2e2e3e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.95em;
+  color: #ffcc99;
+}
+
+#rendered pre {
+  background-color: #282838;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  color: #eaeaea;
+  font-family: monospace;
+}
+
+#rendered table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+#rendered th,
+#rendered td {
+  border: 1px solid #555;
+  padding: 8px 12px;
+}
+
+#rendered th {
+  background-color: #33334a;
+  color: #fff;
+  text-align: left;
+}
+
+#rendered a {
+  color: #82aaff;
+  text-decoration: underline;
+}
+
+#rendered hr {
+  border: none;
+  border-top: 1px solid #555;
+  margin: 2em 0;
+}
+
+#rendered img {
+  width: 100%;
+  margin: 1em 0;
+  border-radius: 6px;
+}
+
+
+#rendered {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+#rendered img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+#rendered pre {
+  background: #1e1e1e;
+  /* Fondo de código, opcional */
+  padding: 1rem;
+  overflow-x: auto;
+  /* Scroll horizontal solo en bloques de código */
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+
+#rendered code {
+  white-space: pre;
+}
+
+
+#rendered li.checklist {
+  list-style-type: none;
+}
+
+
+/* include /homedir|userdirwindows/.noteblocks/editor.css */
+
+
+/* TOC */
+/* Contenedor principal */
+.toc {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  /* semi-transparente */
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: inherit;
+  /* hereda color del tema */
+  font-size: 0.9rem;
+  overflow: auto;
+}
+
+/* Reset de contadores */
+.toc {
+  counter-reset: h1;
+}
+
+/* Listas limpias y anidado */
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 0.1em;
+}
+
+/* Nivel 1 */
+.toc>ul>li {
+  counter-increment: h1;
+}
+
+.toc>ul>li::before {
+  content: counter(h1) ". ";
+  font-weight: bold;
+}
+
+/* Nivel 2 */
+.toc>ul>li>ul {
+  counter-reset: h2;
+}
+
+.toc>ul>li>ul>li {
+  counter-increment: h2;
+}
+
+.toc>ul>li>ul>li::before {
+  content: counter(h1) "." counter(h2) " ";
+}
+
+/* Nivel 3 */
+.toc ul ul ul {
+  counter-reset: h3;
+}
+
+.toc ul ul ul>li {
+  counter-increment: h3;
+}
+
+.toc ul ul ul>li::before {
+  content: counter(h1) "." counter(h2) "." counter(h3) " ";
+}
+
+/* Nivel 4 (opcional extender igual que el 3) */
+.toc ul ul ul ul {
+  counter-reset: h4;
+}
+
+.toc ul ul ul ul>li {
+  counter-increment: h4;
+}
+
+.toc ul ul ul ul>li::before {
+  content: counter(h1) "." counter(h2) "." counter(h3) "." counter(h4) " ";
+}
+
+
+
+

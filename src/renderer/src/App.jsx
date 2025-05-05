@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 import { PrimeReactContext } from 'primereact/api';
 
 import 'primeicons/primeicons.css';
-import "primereact/resources/themes/viva-dark/theme.css"
 
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -11,41 +10,60 @@ import NotebookSidebar from './components/NotebookSidebar';
 import NoteSidebar from './components/NoteSidebar';
 import EditorMarkdown from './components/EditorView';
 
-// Dark only
-import { abyss } from '@uiw/codemirror-theme-abyss';
-import { andromeda } from '@uiw/codemirror-theme-andromeda';
-import { copilot} from '@uiw/codemirror-theme-copilot'
-import { atomone } from '@uiw/codemirror-theme-atomone';
-import { aura} from '@uiw/codemirror-theme-aura'
-import { dracula} from '@uiw/codemirror-theme-dracula'
-import {monokai} from '@uiw/codemirror-theme-monokai'
-import { nord} from '@uiw/codemirror-theme-nord'
-import { tokyoNightStorm} from '@uiw/codemirror-theme-tokyo-night-storm'
-
-// light
-import { tokyoNightDay } from '@uiw/codemirror-theme-tokyo-night-day';
-
-// Both
-import { duotoneLight,duotoneDark} from '@uiw/codemirror-theme-duotone'
-import { materialLight,materialDark} from '@uiw/codemirror-theme-material'
-import { vscodeLight,vscodeDark} from '@uiw/codemirror-theme-vscode'
-import { xcodeLight,xcodeDark} from '@uiw/codemirror-theme-xcode'
-import { basicDark,basicLight} from '@uiw/codemirror-theme-basic'
-import { gruvboxLight,gruvboxDark} from '@uiw/codemirror-theme-gruvbox-dark'
-import { tokyoNight} from '@uiw/codemirror-theme-tokyo-night'
-
+import 'primereact/resources/themes/soho-dark/theme.css'
 
 function App() {
   // Tabs
   const [tabs, setTabs] = useState([])
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const [appTheme, setAppTheme] = useState()
-  const [sintaxTheme,setSintaxTheme] = useState(andromeda)
+  const [appTheme, setAppTheme] = useState(() => {
+    return localStorage.getItem('appTheme') || 'lara-dark-blue.css';
+  });
 
-  // const { changeTheme } = useContext(PrimeReactContext);
+  const [sintaxTheme, setSintaxTheme] = useState(() => {
+    return localStorage.getItem('sintaxTheme') || "andromeda";
+  });
+
+  const { changeTheme } = useContext(PrimeReactContext);
 
 
+  // const getCurrentThemeFromHref = () => {
+  //   const themeLink = document.getElementById('theme-link');
+  //   const href = themeLink?.getAttribute('href');
+  //   if (!href) return '';
+  //   const parts = href.split('/');
+  //   console.log(parts[parts.length - 1])
+  //   return parts[parts.length - 1];
+  // };
+
+
+  // useEffect(() => {
+  //   const ensureThemeLinkExists = () => {
+  //     let themeLink = document.getElementById('theme-link');
+  //     if (!themeLink) {
+  //       themeLink = document.createElement('link');
+  //       themeLink.id = 'theme-link';
+  //       themeLink.rel = 'stylesheet';
+  //       // Establece un tema inicial provisional para evitar carga en blanco
+  //       themeLink.href = `styles/${appTheme}`;
+  //       document.head.appendChild(themeLink);
+  //     }
+  //     return themeLink;
+  //   };
+
+  //   const currentTheme = getCurrentThemeFromHref() || 'lara-dark-blue.css';
+  //   ensureThemeLinkExists(); // Asegura que el link exista antes de cambiar el tema
+
+  //   changeTheme(currentTheme, appTheme, 'theme-link', () => {
+  //     localStorage.setItem('appTheme', appTheme);
+  //   });
+  // }, [appTheme]);
+
+
+  useEffect(() => {
+    localStorage.setItem('sintaxTheme', sintaxTheme);
+  }, [sintaxTheme]);
 
   // Avoid Default Keybindings
   useEffect(() => {

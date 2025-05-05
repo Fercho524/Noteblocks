@@ -64,6 +64,8 @@ function createWindow() {
     return { action: 'deny' }
   })
 
+  //mainWindow.webContents.openDevTools()
+
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     //console.log("ENTORNO : ",process.env['ELECTRON_RENDERER_URL']) => http://localhost:5173
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])

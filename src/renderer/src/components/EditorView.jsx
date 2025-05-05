@@ -16,6 +16,7 @@ import 'katex/dist/katex.min.css';
 import { html2MarkDown } from '../utils/markdowwn2HTML';
 import { renderMath } from '../utils/markdowwn2HTML';
 
+import { codeMirrorThemes } from '../utils/codeMirrorThemes';
 import MDToolbar from './MDToolbar';
 
 
@@ -24,7 +25,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
   const [mode, setMode] = useState('split');
   const renderedRef = useRef(null);
   const editorViewRef = useRef(null);
-  const [vh, setVh] = useState(window.innerHeight <= 768 ? 80 : 85);
+  const [vh, setVh] = useState(window.innerHeight <= 768 ? 75 : 85);
 
   // Sintax Theme
   const [theme, setTheme] = useState(materialDark)
@@ -265,7 +266,7 @@ export default function EditorMarkdown({ tabs, setTabs, activeIndex, setActiveIn
                         id="code"
                         key={tab.key}
                         value={tab.content}
-                        theme={sintaxTheme}
+                        theme={codeMirrorThemes[sintaxTheme]}
                         height={`${vh}vh`}
                         style={{
                           background: 'transparent',
